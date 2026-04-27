@@ -19,10 +19,11 @@ const cv::Scalar YOLOv8Seg::kPalette[kPaletteSize] = {
 // ============================================================
 
 YOLOv8Seg::YOLOv8Seg(const std::string& model_path,
-                     float conf_thresh,
-                     float iou_thresh,
-                     int   input_size)
+    float conf_thresh,
+    float iou_thresh,
+    int   input_size)
     : env_(ORT_LOGGING_LEVEL_WARNING, "YOLOv8Seg"),
+      session_opts_(),
       session_(nullptr),
       input_size_(input_size),
       conf_thresh_(conf_thresh),
@@ -31,6 +32,9 @@ YOLOv8Seg::YOLOv8Seg(const std::string& model_path,
     session_opts_.SetIntraOpNumThreads(1);
     session_opts_.SetGraphOptimizationLevel(
         GraphOptimizationLevel::ORT_ENABLE_EXTENDED);
+
+    // Windows: char → wchar_t
+    std::wstring wpath(model_path.begin(), model_path.end());
 
     session_ = Ort::Session(env_, model_path.c_str(), session_opts_);
 

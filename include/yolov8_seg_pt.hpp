@@ -75,6 +75,6 @@ private:
     float conf_thresh_;
     float iou_thresh_;
 
-    static constexpr int kPaletteSize = 20;
+    static constexpr int kPaletteSize = 1;
     static const cv::Scalar kPalette[kPaletteSize];
 };
