@@ -1,4 +1,4 @@
-#include "yolov8seg.hpp"
+#include "include/yolov8_seg_pt.hpp"
 #include <iostream>
 
 static const std::vector<std::string> COCO_CLASSES = {
@@ -9,7 +9,7 @@ int main(int argc, char** argv)
 {
     if (argc < 3) {
         std::cerr << "Usage: " << argv[0]
-                  << " <model-seg.onnx> <image.(jpg|png)> [conf=0.25] [iou=0.45]\n";
+                  << " <model-seg.onnx> <image.(jpg|png)> [conf=0.75] [iou=0.15]\n";
         return 1;
     }
 

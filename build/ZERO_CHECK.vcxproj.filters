@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="18.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\Supervisor\source\repos\bricks_cpp_prototype\build\CMakeFiles\babf7373c89828fc31a67b400dd16ffd\generate.stamp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{80EAB122-BE85-36AC-ABD5-DEFD35348CC6}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

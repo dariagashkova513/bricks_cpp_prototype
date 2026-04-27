@@ -1,0 +1,111 @@
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64/cl.exe 
+Build flags: /DWIN32;/D_WINDOWS;/GR;/EHsc
+Id flags:  
+
+The output was:
+2
+Microsoft (R) C/C++-Optimierungscompiler Version 19.29.30159 für x64
+Copyright (C) Microsoft Corporation. Alle Rechte vorbehalten.
+
+CMakeCXXCompilerId.cpp
+Microsoft (R) Incremental Linker Version 14.29.30159.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+/out:CMakeCXXCompilerId.exe 
+CMakeCXXCompilerId.obj 
+LINK : fatal error LNK1104: Datei "kernel32.lib" kann nicht geöffnet werden.
+
+
+Detecting CXX compiler ABI info failed to compile with the following output:
+Change Dir: C:/Users/Supervisor/source/repos/bricks_cpp_prototype/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_d3e82 && [1/2] Building CXX object CMakeFiles\cmTC_d3e82.dir\CMakeCXXCompilerABI.cpp.obj
+[2/2] Linking CXX executable cmTC_d3e82.exe
+FAILED: cmTC_d3e82.exe 
+cmd.exe /C "cd . && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_d3e82.dir --rc=C:\PROGRA~2\WI3CF2~1\10\bin\100261~1.0\x64\rc.exe --mt=C:\PROGRA~2\WI3CF2~1\10\bin\100261~1.0\x64\mt.exe --manifests  -- C:\PROGRA~1\MICROS~3\18\COMMUN~1\VC\Tools\MSVC\1450~1.357\bin\Hostx64\x64\link.exe /nologo CMakeFiles\cmTC_d3e82.dir\CMakeCXXCompilerABI.cpp.obj  /out:cmTC_d3e82.exe /implib:cmTC_d3e82.lib /pdb:cmTC_d3e82.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+LINK Pass 1: command "C:\PROGRA~1\MICROS~3\18\COMMUN~1\VC\Tools\MSVC\1450~1.357\bin\Hostx64\x64\link.exe /nologo CMakeFiles\cmTC_d3e82.dir\CMakeCXXCompilerABI.cpp.obj /out:cmTC_d3e82.exe /implib:cmTC_d3e82.lib /pdb:cmTC_d3e82.pdb /version:0.0 /machine:x64 /debug /INCREMENTAL /subsystem:console kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTFILE:CMakeFiles\cmTC_d3e82.dir/intermediate.manifest CMakeFiles\cmTC_d3e82.dir/manifest.res" failed (exit code 1104) with the following output:
+LINK : fatal error LNK1104: Datei "kernel32.lib" kann nicht geöffnet werden.
+ninja: build stopped: subcommand failed.
+
+
+
+
+Determining if the CXX compiler works failed with the following output:
+Change Dir: C:/Users/Supervisor/source/repos/bricks_cpp_prototype/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_177af && [1/2] Building CXX object CMakeFiles\cmTC_177af.dir\testCXXCompiler.cxx.obj
+[2/2] Linking CXX executable cmTC_177af.exe
+FAILED: cmTC_177af.exe 
+cmd.exe /C "cd . && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_177af.dir --rc=C:\PROGRA~2\WI3CF2~1\10\bin\100261~1.0\x64\rc.exe --mt=C:\PROGRA~2\WI3CF2~1\10\bin\100261~1.0\x64\mt.exe --manifests  -- C:\PROGRA~1\MICROS~3\18\COMMUN~1\VC\Tools\MSVC\1450~1.357\bin\Hostx64\x64\link.exe /nologo CMakeFiles\cmTC_177af.dir\testCXXCompiler.cxx.obj  /out:cmTC_177af.exe /implib:cmTC_177af.lib /pdb:cmTC_177af.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+LINK Pass 1: command "C:\PROGRA~1\MICROS~3\18\COMMUN~1\VC\Tools\MSVC\1450~1.357\bin\Hostx64\x64\link.exe /nologo CMakeFiles\cmTC_177af.dir\testCXXCompiler.cxx.obj /out:cmTC_177af.exe /implib:cmTC_177af.lib /pdb:cmTC_177af.pdb /version:0.0 /machine:x64 /debug /INCREMENTAL /subsystem:console kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTFILE:CMakeFiles\cmTC_177af.dir/intermediate.manifest CMakeFiles\cmTC_177af.dir/manifest.res" failed (exit code 1104) with the following output:
+LINK : fatal error LNK1104: Datei "kernel32.lib" kann nicht geöffnet werden.
+ninja: build stopped: subcommand failed.
+
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64/cl.exe 
+Build flags: /DWIN32;/D_WINDOWS;/GR;/EHsc
+Id flags:  
+
+The output was:
+2
+Microsoft (R) C/C++-Optimierungscompiler Version 19.29.30159 für x64
+Copyright (C) Microsoft Corporation. Alle Rechte vorbehalten.
+
+CMakeCXXCompilerId.cpp
+Microsoft (R) Incremental Linker Version 14.29.30159.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+/out:CMakeCXXCompilerId.exe 
+CMakeCXXCompilerId.obj 
+LINK : fatal error LNK1104: Datei "kernel32.lib" kann nicht geöffnet werden.
+
+
+Detecting CXX compiler ABI info failed to compile with the following output:
+Change Dir: C:/Users/Supervisor/source/repos/bricks_cpp_prototype/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_765f8 && [1/2] Building CXX object CMakeFiles\cmTC_765f8.dir\CMakeCXXCompilerABI.cpp.obj
+[2/2] Linking CXX executable cmTC_765f8.exe
+FAILED: cmTC_765f8.exe 
+cmd.exe /C "cd . && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_765f8.dir --rc=C:\PROGRA~2\WI3CF2~1\10\bin\100261~1.0\x64\rc.exe --mt=C:\PROGRA~2\WI3CF2~1\10\bin\100261~1.0\x64\mt.exe --manifests  -- C:\PROGRA~2\MICROS~2\2019\COMMUN~1\VC\Tools\MSVC\1429~1.301\bin\Hostx64\x64\link.exe /nologo CMakeFiles\cmTC_765f8.dir\CMakeCXXCompilerABI.cpp.obj  /out:cmTC_765f8.exe /implib:cmTC_765f8.lib /pdb:cmTC_765f8.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+LINK Pass 1: command "C:\PROGRA~2\MICROS~2\2019\COMMUN~1\VC\Tools\MSVC\1429~1.301\bin\Hostx64\x64\link.exe /nologo CMakeFiles\cmTC_765f8.dir\CMakeCXXCompilerABI.cpp.obj /out:cmTC_765f8.exe /implib:cmTC_765f8.lib /pdb:cmTC_765f8.pdb /version:0.0 /machine:x64 /debug /INCREMENTAL /subsystem:console kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTFILE:CMakeFiles\cmTC_765f8.dir/intermediate.manifest CMakeFiles\cmTC_765f8.dir/manifest.res" failed (exit code 1104) with the following output:
+LINK : fatal error LNK1104: Datei "kernel32.lib" kann nicht geöffnet werden.
+ninja: build stopped: subcommand failed.
+
+
+
+
+Determining if the CXX compiler works failed with the following output:
+Change Dir: C:/Users/Supervisor/source/repos/bricks_cpp_prototype/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_697e5 && [1/2] Building CXX object CMakeFiles\cmTC_697e5.dir\testCXXCompiler.cxx.obj
+[2/2] Linking CXX executable cmTC_697e5.exe
+FAILED: cmTC_697e5.exe 
+cmd.exe /C "cd . && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_697e5.dir --rc=C:\PROGRA~2\WI3CF2~1\10\bin\100261~1.0\x64\rc.exe --mt=C:\PROGRA~2\WI3CF2~1\10\bin\100261~1.0\x64\mt.exe --manifests  -- C:\PROGRA~2\MICROS~2\2019\COMMUN~1\VC\Tools\MSVC\1429~1.301\bin\Hostx64\x64\link.exe /nologo CMakeFiles\cmTC_697e5.dir\testCXXCompiler.cxx.obj  /out:cmTC_697e5.exe /implib:cmTC_697e5.lib /pdb:cmTC_697e5.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+LINK Pass 1: command "C:\PROGRA~2\MICROS~2\2019\COMMUN~1\VC\Tools\MSVC\1429~1.301\bin\Hostx64\x64\link.exe /nologo CMakeFiles\cmTC_697e5.dir\testCXXCompiler.cxx.obj /out:cmTC_697e5.exe /implib:cmTC_697e5.lib /pdb:cmTC_697e5.pdb /version:0.0 /machine:x64 /debug /INCREMENTAL /subsystem:console kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /MANIFESTFILE:CMakeFiles\cmTC_697e5.dir/intermediate.manifest CMakeFiles\cmTC_697e5.dir/manifest.res" failed (exit code 1104) with the following output:
+LINK : fatal error LNK1104: Datei "kernel32.lib" kann nicht geöffnet werden.
+ninja: build stopped: subcommand failed.
+
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64/cl.exe 
+Build flags: /DWIN32;/D_WINDOWS;/GR;/EHsc
+Id flags:  
+
+The output was:
+2
+Microsoft (R) C/C++-Optimierungscompiler Version 19.29.30159 für x64
+Copyright (C) Microsoft Corporation. Alle Rechte vorbehalten.
+
+CMakeCXXCompilerId.cpp
+Microsoft (R) Incremental Linker Version 14.29.30159.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+/out:CMakeCXXCompilerId.exe 
+CMakeCXXCompilerId.obj 
+LINK : fatal error LNK1104: Datei "kernel32.lib" kann nicht geöffnet werden.
+
+

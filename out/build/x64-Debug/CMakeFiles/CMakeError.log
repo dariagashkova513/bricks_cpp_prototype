@@ -1,0 +1,782 @@
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64/cl.exe 
+Build flags: 
+Id flags:  
+
+The output was:
+2
+Microsoft (R) C/C++-Optimierungscompiler Version 19.29.30159 für x64
+Copyright (C) Microsoft Corporation. Alle Rechte vorbehalten.
+
+CMakeCXXCompilerId.cpp
+Microsoft (R) Incremental Linker Version 14.29.30159.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+/out:CMakeCXXCompilerId.exe 
+CMakeCXXCompilerId.obj 
+LINK : fatal error LNK1104: Datei "kernel32.lib" kann nicht geöffnet werden.
+
+
+Detecting CXX compiler ABI info failed to compile with the following output:
+Change Dir: C:/Users/Supervisor/source/repos/bricks_cpp_prototype/out/build/x64-Debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_44d83 && [1/2] Building CXX object CMakeFiles\cmTC_44d83.dir\CMakeCXXCompilerABI.cpp.obj
+[2/2] Linking CXX executable cmTC_44d83.exe
+FAILED: cmTC_44d83.exe 
+cmd.exe /C "cd . && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_44d83.dir --rc=rc --mt=CMAKE_MT-NOTFOUND --manifests  -- C:\PROGRA~2\MICROS~2\2019\COMMUN~1\VC\Tools\MSVC\1429~1.301\bin\Hostx64\x64\link.exe /nologo CMakeFiles\cmTC_44d83.dir\CMakeCXXCompilerABI.cpp.obj  /out:cmTC_44d83.exe /implib:cmTC_44d83.lib /pdb:cmTC_44d83.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+RC Pass 1: command "rc /fo CMakeFiles\cmTC_44d83.dir/manifest.res CMakeFiles\cmTC_44d83.dir/manifest.rc" failed (exit code 0) with the following output:
+Das System kann die angegebene Datei nicht finden
+ninja: build stopped: subcommand failed.
+
+
+
+
+Determining if the CXX compiler works failed with the following output:
+Change Dir: C:/Users/Supervisor/source/repos/bricks_cpp_prototype/out/build/x64-Debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_53841 && [1/2] Building CXX object CMakeFiles\cmTC_53841.dir\testCXXCompiler.cxx.obj
+[2/2] Linking CXX executable cmTC_53841.exe
+FAILED: cmTC_53841.exe 
+cmd.exe /C "cd . && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_53841.dir --rc=rc --mt=CMAKE_MT-NOTFOUND --manifests  -- C:\PROGRA~2\MICROS~2\2019\COMMUN~1\VC\Tools\MSVC\1429~1.301\bin\Hostx64\x64\link.exe /nologo CMakeFiles\cmTC_53841.dir\testCXXCompiler.cxx.obj  /out:cmTC_53841.exe /implib:cmTC_53841.lib /pdb:cmTC_53841.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+RC Pass 1: command "rc /fo CMakeFiles\cmTC_53841.dir/manifest.res CMakeFiles\cmTC_53841.dir/manifest.rc" failed (exit code 0) with the following output:
+Das System kann die angegebene Datei nicht finden
+ninja: build stopped: subcommand failed.
+
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64/cl.exe 
+Build flags: /DWIN32;/D_WINDOWS;/GR;/EHsc
+Id flags:  
+
+The output was:
+2
+Microsoft (R) C/C++-Optimierungscompiler Version 19.29.30159 für x64
+Copyright (C) Microsoft Corporation. Alle Rechte vorbehalten.
+
+CMakeCXXCompilerId.cpp
+Microsoft (R) Incremental Linker Version 14.29.30159.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+/out:CMakeCXXCompilerId.exe 
+CMakeCXXCompilerId.obj 
+LINK : fatal error LNK1104: Datei "kernel32.lib" kann nicht geöffnet werden.
+
+
+Detecting CXX compiler ABI info failed to compile with the following output:
+Change Dir: C:/Users/Supervisor/source/repos/bricks_cpp_prototype/out/build/x64-Debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_82cda && [1/2] Building CXX object CMakeFiles\cmTC_82cda.dir\CMakeCXXCompilerABI.cpp.obj
+[2/2] Linking CXX executable cmTC_82cda.exe
+FAILED: cmTC_82cda.exe 
+cmd.exe /C "cd . && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_82cda.dir --rc=rc --mt=CMAKE_MT-NOTFOUND --manifests  -- C:\PROGRA~2\MICROS~2\2019\COMMUN~1\VC\Tools\MSVC\1429~1.301\bin\Hostx64\x64\link.exe /nologo CMakeFiles\cmTC_82cda.dir\CMakeCXXCompilerABI.cpp.obj  /out:cmTC_82cda.exe /implib:cmTC_82cda.lib /pdb:cmTC_82cda.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+RC Pass 1: command "rc /fo CMakeFiles\cmTC_82cda.dir/manifest.res CMakeFiles\cmTC_82cda.dir/manifest.rc" failed (exit code 0) with the following output:
+Das System kann die angegebene Datei nicht finden
+ninja: build stopped: subcommand failed.
+
+
+
+
+Determining if the CXX compiler works failed with the following output:
+Change Dir: C:/Users/Supervisor/source/repos/bricks_cpp_prototype/out/build/x64-Debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_0f635 && [1/2] Building CXX object CMakeFiles\cmTC_0f635.dir\testCXXCompiler.cxx.obj
+[2/2] Linking CXX executable cmTC_0f635.exe
+FAILED: cmTC_0f635.exe 
+cmd.exe /C "cd . && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_0f635.dir --rc=rc --mt=CMAKE_MT-NOTFOUND --manifests  -- C:\PROGRA~2\MICROS~2\2019\COMMUN~1\VC\Tools\MSVC\1429~1.301\bin\Hostx64\x64\link.exe /nologo CMakeFiles\cmTC_0f635.dir\testCXXCompiler.cxx.obj  /out:cmTC_0f635.exe /implib:cmTC_0f635.lib /pdb:cmTC_0f635.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+RC Pass 1: command "rc /fo CMakeFiles\cmTC_0f635.dir/manifest.res CMakeFiles\cmTC_0f635.dir/manifest.rc" failed (exit code 0) with the following output:
+Das System kann die angegebene Datei nicht finden
+ninja: build stopped: subcommand failed.
+
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64/cl.exe 
+Build flags: /DWIN32;/D_WINDOWS;/GR;/EHsc
+Id flags:  
+
+The output was:
+2
+Microsoft (R) C/C++-Optimierungscompiler Version 19.29.30159 für x64
+Copyright (C) Microsoft Corporation. Alle Rechte vorbehalten.
+
+CMakeCXXCompilerId.cpp
+Microsoft (R) Incremental Linker Version 14.29.30159.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+/out:CMakeCXXCompilerId.exe 
+CMakeCXXCompilerId.obj 
+LINK : fatal error LNK1104: Datei "kernel32.lib" kann nicht geöffnet werden.
+
+
+Detecting CXX compiler ABI info failed to compile with the following output:
+Change Dir: C:/Users/Supervisor/source/repos/bricks_cpp_prototype/out/build/x64-Debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_82499 && [1/2] Building CXX object CMakeFiles\cmTC_82499.dir\CMakeCXXCompilerABI.cpp.obj
+[2/2] Linking CXX executable cmTC_82499.exe
+FAILED: cmTC_82499.exe 
+cmd.exe /C "cd . && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_82499.dir --rc=rc --mt=CMAKE_MT-NOTFOUND --manifests  -- C:\PROGRA~2\MICROS~2\2019\COMMUN~1\VC\Tools\MSVC\1429~1.301\bin\Hostx64\x64\link.exe /nologo CMakeFiles\cmTC_82499.dir\CMakeCXXCompilerABI.cpp.obj  /out:cmTC_82499.exe /implib:cmTC_82499.lib /pdb:cmTC_82499.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+RC Pass 1: command "rc /fo CMakeFiles\cmTC_82499.dir/manifest.res CMakeFiles\cmTC_82499.dir/manifest.rc" failed (exit code 0) with the following output:
+Das System kann die angegebene Datei nicht finden
+ninja: build stopped: subcommand failed.
+
+
+
+
+Determining if the CXX compiler works failed with the following output:
+Change Dir: C:/Users/Supervisor/source/repos/bricks_cpp_prototype/out/build/x64-Debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_2baa1 && [1/2] Building CXX object CMakeFiles\cmTC_2baa1.dir\testCXXCompiler.cxx.obj
+[2/2] Linking CXX executable cmTC_2baa1.exe
+FAILED: cmTC_2baa1.exe 
+cmd.exe /C "cd . && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_2baa1.dir --rc=rc --mt=CMAKE_MT-NOTFOUND --manifests  -- C:\PROGRA~2\MICROS~2\2019\COMMUN~1\VC\Tools\MSVC\1429~1.301\bin\Hostx64\x64\link.exe /nologo CMakeFiles\cmTC_2baa1.dir\testCXXCompiler.cxx.obj  /out:cmTC_2baa1.exe /implib:cmTC_2baa1.lib /pdb:cmTC_2baa1.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+RC Pass 1: command "rc /fo CMakeFiles\cmTC_2baa1.dir/manifest.res CMakeFiles\cmTC_2baa1.dir/manifest.rc" failed (exit code 0) with the following output:
+Das System kann die angegebene Datei nicht finden
+ninja: build stopped: subcommand failed.
+
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64/cl.exe 
+Build flags: /DWIN32;/D_WINDOWS;/GR;/EHsc
+Id flags:  
+
+The output was:
+2
+Microsoft (R) C/C++-Optimierungscompiler Version 19.29.30159 für x64
+Copyright (C) Microsoft Corporation. Alle Rechte vorbehalten.
+
+CMakeCXXCompilerId.cpp
+Microsoft (R) Incremental Linker Version 14.29.30159.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+/out:CMakeCXXCompilerId.exe 
+CMakeCXXCompilerId.obj 
+LINK : fatal error LNK1104: Datei "kernel32.lib" kann nicht geöffnet werden.
+
+
+Detecting CXX compiler ABI info failed to compile with the following output:
+Change Dir: C:/Users/Supervisor/source/repos/bricks_cpp_prototype/out/build/x64-Debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_1ffd5 && [1/2] Building CXX object CMakeFiles\cmTC_1ffd5.dir\CMakeCXXCompilerABI.cpp.obj
+[2/2] Linking CXX executable cmTC_1ffd5.exe
+FAILED: cmTC_1ffd5.exe 
+cmd.exe /C "cd . && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_1ffd5.dir --rc=rc --mt=CMAKE_MT-NOTFOUND --manifests  -- C:\PROGRA~2\MICROS~2\2019\COMMUN~1\VC\Tools\MSVC\1429~1.301\bin\Hostx64\x64\link.exe /nologo CMakeFiles\cmTC_1ffd5.dir\CMakeCXXCompilerABI.cpp.obj  /out:cmTC_1ffd5.exe /implib:cmTC_1ffd5.lib /pdb:cmTC_1ffd5.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+RC Pass 1: command "rc /fo CMakeFiles\cmTC_1ffd5.dir/manifest.res CMakeFiles\cmTC_1ffd5.dir/manifest.rc" failed (exit code 0) with the following output:
+Das System kann die angegebene Datei nicht finden
+ninja: build stopped: subcommand failed.
+
+
+
+
+Determining if the CXX compiler works failed with the following output:
+Change Dir: C:/Users/Supervisor/source/repos/bricks_cpp_prototype/out/build/x64-Debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_b7b5b && [1/2] Building CXX object CMakeFiles\cmTC_b7b5b.dir\testCXXCompiler.cxx.obj
+[2/2] Linking CXX executable cmTC_b7b5b.exe
+FAILED: cmTC_b7b5b.exe 
+cmd.exe /C "cd . && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_b7b5b.dir --rc=rc --mt=CMAKE_MT-NOTFOUND --manifests  -- C:\PROGRA~2\MICROS~2\2019\COMMUN~1\VC\Tools\MSVC\1429~1.301\bin\Hostx64\x64\link.exe /nologo CMakeFiles\cmTC_b7b5b.dir\testCXXCompiler.cxx.obj  /out:cmTC_b7b5b.exe /implib:cmTC_b7b5b.lib /pdb:cmTC_b7b5b.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+RC Pass 1: command "rc /fo CMakeFiles\cmTC_b7b5b.dir/manifest.res CMakeFiles\cmTC_b7b5b.dir/manifest.rc" failed (exit code 0) with the following output:
+Das System kann die angegebene Datei nicht finden
+ninja: build stopped: subcommand failed.
+
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64/cl.exe 
+Build flags: /DWIN32;/D_WINDOWS;/GR;/EHsc
+Id flags:  
+
+The output was:
+2
+Microsoft (R) C/C++-Optimierungscompiler Version 19.29.30159 für x64
+Copyright (C) Microsoft Corporation. Alle Rechte vorbehalten.
+
+CMakeCXXCompilerId.cpp
+Microsoft (R) Incremental Linker Version 14.29.30159.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+/out:CMakeCXXCompilerId.exe 
+CMakeCXXCompilerId.obj 
+LINK : fatal error LNK1104: Datei "kernel32.lib" kann nicht geöffnet werden.
+
+
+Detecting CXX compiler ABI info failed to compile with the following output:
+Change Dir: C:/Users/Supervisor/source/repos/bricks_cpp_prototype/out/build/x64-Debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_2abd8 && [1/2] Building CXX object CMakeFiles\cmTC_2abd8.dir\CMakeCXXCompilerABI.cpp.obj
+[2/2] Linking CXX executable cmTC_2abd8.exe
+FAILED: cmTC_2abd8.exe 
+cmd.exe /C "cd . && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_2abd8.dir --rc=rc --mt=CMAKE_MT-NOTFOUND --manifests  -- C:\PROGRA~2\MICROS~2\2019\COMMUN~1\VC\Tools\MSVC\1429~1.301\bin\Hostx64\x64\link.exe /nologo CMakeFiles\cmTC_2abd8.dir\CMakeCXXCompilerABI.cpp.obj  /out:cmTC_2abd8.exe /implib:cmTC_2abd8.lib /pdb:cmTC_2abd8.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+RC Pass 1: command "rc /fo CMakeFiles\cmTC_2abd8.dir/manifest.res CMakeFiles\cmTC_2abd8.dir/manifest.rc" failed (exit code 0) with the following output:
+Das System kann die angegebene Datei nicht finden
+ninja: build stopped: subcommand failed.
+
+
+
+
+Determining if the CXX compiler works failed with the following output:
+Change Dir: C:/Users/Supervisor/source/repos/bricks_cpp_prototype/out/build/x64-Debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_2b350 && [1/2] Building CXX object CMakeFiles\cmTC_2b350.dir\testCXXCompiler.cxx.obj
+[2/2] Linking CXX executable cmTC_2b350.exe
+FAILED: cmTC_2b350.exe 
+cmd.exe /C "cd . && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_2b350.dir --rc=rc --mt=CMAKE_MT-NOTFOUND --manifests  -- C:\PROGRA~2\MICROS~2\2019\COMMUN~1\VC\Tools\MSVC\1429~1.301\bin\Hostx64\x64\link.exe /nologo CMakeFiles\cmTC_2b350.dir\testCXXCompiler.cxx.obj  /out:cmTC_2b350.exe /implib:cmTC_2b350.lib /pdb:cmTC_2b350.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+RC Pass 1: command "rc /fo CMakeFiles\cmTC_2b350.dir/manifest.res CMakeFiles\cmTC_2b350.dir/manifest.rc" failed (exit code 0) with the following output:
+Das System kann die angegebene Datei nicht finden
+ninja: build stopped: subcommand failed.
+
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64/cl.exe 
+Build flags: /DWIN32;/D_WINDOWS;/GR;/EHsc
+Id flags:  
+
+The output was:
+2
+Microsoft (R) C/C++-Optimierungscompiler Version 19.29.30159 für x64
+Copyright (C) Microsoft Corporation. Alle Rechte vorbehalten.
+
+CMakeCXXCompilerId.cpp
+Microsoft (R) Incremental Linker Version 14.29.30159.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+/out:CMakeCXXCompilerId.exe 
+CMakeCXXCompilerId.obj 
+LINK : fatal error LNK1104: Datei "kernel32.lib" kann nicht geöffnet werden.
+
+
+Detecting CXX compiler ABI info failed to compile with the following output:
+Change Dir: C:/Users/Supervisor/source/repos/bricks_cpp_prototype/out/build/x64-Debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_308d5 && [1/2] Building CXX object CMakeFiles\cmTC_308d5.dir\CMakeCXXCompilerABI.cpp.obj
+[2/2] Linking CXX executable cmTC_308d5.exe
+FAILED: cmTC_308d5.exe 
+cmd.exe /C "cd . && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_308d5.dir --rc=rc --mt=CMAKE_MT-NOTFOUND --manifests  -- C:\PROGRA~2\MICROS~2\2019\COMMUN~1\VC\Tools\MSVC\1429~1.301\bin\Hostx64\x64\link.exe /nologo CMakeFiles\cmTC_308d5.dir\CMakeCXXCompilerABI.cpp.obj  /out:cmTC_308d5.exe /implib:cmTC_308d5.lib /pdb:cmTC_308d5.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+RC Pass 1: command "rc /fo CMakeFiles\cmTC_308d5.dir/manifest.res CMakeFiles\cmTC_308d5.dir/manifest.rc" failed (exit code 0) with the following output:
+Das System kann die angegebene Datei nicht finden
+ninja: build stopped: subcommand failed.
+
+
+
+
+Determining if the CXX compiler works failed with the following output:
+Change Dir: C:/Users/Supervisor/source/repos/bricks_cpp_prototype/out/build/x64-Debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_e62d5 && [1/2] Building CXX object CMakeFiles\cmTC_e62d5.dir\testCXXCompiler.cxx.obj
+[2/2] Linking CXX executable cmTC_e62d5.exe
+FAILED: cmTC_e62d5.exe 
+cmd.exe /C "cd . && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_e62d5.dir --rc=rc --mt=CMAKE_MT-NOTFOUND --manifests  -- C:\PROGRA~2\MICROS~2\2019\COMMUN~1\VC\Tools\MSVC\1429~1.301\bin\Hostx64\x64\link.exe /nologo CMakeFiles\cmTC_e62d5.dir\testCXXCompiler.cxx.obj  /out:cmTC_e62d5.exe /implib:cmTC_e62d5.lib /pdb:cmTC_e62d5.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+RC Pass 1: command "rc /fo CMakeFiles\cmTC_e62d5.dir/manifest.res CMakeFiles\cmTC_e62d5.dir/manifest.rc" failed (exit code 0) with the following output:
+Das System kann die angegebene Datei nicht finden
+ninja: build stopped: subcommand failed.
+
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64/cl.exe 
+Build flags: /DWIN32;/D_WINDOWS;/GR;/EHsc
+Id flags:  
+
+The output was:
+2
+Microsoft (R) C/C++-Optimierungscompiler Version 19.29.30159 für x64
+Copyright (C) Microsoft Corporation. Alle Rechte vorbehalten.
+
+CMakeCXXCompilerId.cpp
+Microsoft (R) Incremental Linker Version 14.29.30159.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+/out:CMakeCXXCompilerId.exe 
+CMakeCXXCompilerId.obj 
+LINK : fatal error LNK1104: Datei "kernel32.lib" kann nicht geöffnet werden.
+
+
+Detecting CXX compiler ABI info failed to compile with the following output:
+Change Dir: C:/Users/Supervisor/source/repos/bricks_cpp_prototype/out/build/x64-Debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_a0808 && [1/2] Building CXX object CMakeFiles\cmTC_a0808.dir\CMakeCXXCompilerABI.cpp.obj
+[2/2] Linking CXX executable cmTC_a0808.exe
+FAILED: cmTC_a0808.exe 
+cmd.exe /C "cd . && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_a0808.dir --rc=rc --mt=CMAKE_MT-NOTFOUND --manifests  -- C:\PROGRA~2\MICROS~2\2019\COMMUN~1\VC\Tools\MSVC\1429~1.301\bin\Hostx64\x64\link.exe /nologo CMakeFiles\cmTC_a0808.dir\CMakeCXXCompilerABI.cpp.obj  /out:cmTC_a0808.exe /implib:cmTC_a0808.lib /pdb:cmTC_a0808.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+RC Pass 1: command "rc /fo CMakeFiles\cmTC_a0808.dir/manifest.res CMakeFiles\cmTC_a0808.dir/manifest.rc" failed (exit code 0) with the following output:
+Das System kann die angegebene Datei nicht finden
+ninja: build stopped: subcommand failed.
+
+
+
+
+Determining if the CXX compiler works failed with the following output:
+Change Dir: C:/Users/Supervisor/source/repos/bricks_cpp_prototype/out/build/x64-Debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_88cdc && [1/2] Building CXX object CMakeFiles\cmTC_88cdc.dir\testCXXCompiler.cxx.obj
+[2/2] Linking CXX executable cmTC_88cdc.exe
+FAILED: cmTC_88cdc.exe 
+cmd.exe /C "cd . && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_88cdc.dir --rc=rc --mt=CMAKE_MT-NOTFOUND --manifests  -- C:\PROGRA~2\MICROS~2\2019\COMMUN~1\VC\Tools\MSVC\1429~1.301\bin\Hostx64\x64\link.exe /nologo CMakeFiles\cmTC_88cdc.dir\testCXXCompiler.cxx.obj  /out:cmTC_88cdc.exe /implib:cmTC_88cdc.lib /pdb:cmTC_88cdc.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+RC Pass 1: command "rc /fo CMakeFiles\cmTC_88cdc.dir/manifest.res CMakeFiles\cmTC_88cdc.dir/manifest.rc" failed (exit code 0) with the following output:
+Das System kann die angegebene Datei nicht finden
+ninja: build stopped: subcommand failed.
+
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64/cl.exe 
+Build flags: /DWIN32;/D_WINDOWS;/GR;/EHsc
+Id flags:  
+
+The output was:
+2
+Microsoft (R) C/C++-Optimierungscompiler Version 19.29.30159 für x64
+Copyright (C) Microsoft Corporation. Alle Rechte vorbehalten.
+
+CMakeCXXCompilerId.cpp
+Microsoft (R) Incremental Linker Version 14.29.30159.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+/out:CMakeCXXCompilerId.exe 
+CMakeCXXCompilerId.obj 
+LINK : fatal error LNK1104: Datei "kernel32.lib" kann nicht geöffnet werden.
+
+
+Detecting CXX compiler ABI info failed to compile with the following output:
+Change Dir: C:/Users/Supervisor/source/repos/bricks_cpp_prototype/out/build/x64-Debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_36495 && [1/2] Building CXX object CMakeFiles\cmTC_36495.dir\CMakeCXXCompilerABI.cpp.obj
+[2/2] Linking CXX executable cmTC_36495.exe
+FAILED: cmTC_36495.exe 
+cmd.exe /C "cd . && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_36495.dir --rc=rc --mt=CMAKE_MT-NOTFOUND --manifests  -- C:\PROGRA~2\MICROS~2\2019\COMMUN~1\VC\Tools\MSVC\1429~1.301\bin\Hostx64\x64\link.exe /nologo CMakeFiles\cmTC_36495.dir\CMakeCXXCompilerABI.cpp.obj  /out:cmTC_36495.exe /implib:cmTC_36495.lib /pdb:cmTC_36495.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+RC Pass 1: command "rc /fo CMakeFiles\cmTC_36495.dir/manifest.res CMakeFiles\cmTC_36495.dir/manifest.rc" failed (exit code 0) with the following output:
+Das System kann die angegebene Datei nicht finden
+ninja: build stopped: subcommand failed.
+
+
+
+
+Determining if the CXX compiler works failed with the following output:
+Change Dir: C:/Users/Supervisor/source/repos/bricks_cpp_prototype/out/build/x64-Debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_34240 && [1/2] Building CXX object CMakeFiles\cmTC_34240.dir\testCXXCompiler.cxx.obj
+[2/2] Linking CXX executable cmTC_34240.exe
+FAILED: cmTC_34240.exe 
+cmd.exe /C "cd . && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_34240.dir --rc=rc --mt=CMAKE_MT-NOTFOUND --manifests  -- C:\PROGRA~2\MICROS~2\2019\COMMUN~1\VC\Tools\MSVC\1429~1.301\bin\Hostx64\x64\link.exe /nologo CMakeFiles\cmTC_34240.dir\testCXXCompiler.cxx.obj  /out:cmTC_34240.exe /implib:cmTC_34240.lib /pdb:cmTC_34240.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+RC Pass 1: command "rc /fo CMakeFiles\cmTC_34240.dir/manifest.res CMakeFiles\cmTC_34240.dir/manifest.rc" failed (exit code 0) with the following output:
+Das System kann die angegebene Datei nicht finden
+ninja: build stopped: subcommand failed.
+
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64/cl.exe 
+Build flags: /DWIN32;/D_WINDOWS;/GR;/EHsc
+Id flags:  
+
+The output was:
+2
+Microsoft (R) C/C++-Optimierungscompiler Version 19.29.30159 für x64
+Copyright (C) Microsoft Corporation. Alle Rechte vorbehalten.
+
+CMakeCXXCompilerId.cpp
+Microsoft (R) Incremental Linker Version 14.29.30159.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+/out:CMakeCXXCompilerId.exe 
+CMakeCXXCompilerId.obj 
+LINK : fatal error LNK1104: Datei "kernel32.lib" kann nicht geöffnet werden.
+
+
+Detecting CXX compiler ABI info failed to compile with the following output:
+Change Dir: C:/Users/Supervisor/source/repos/bricks_cpp_prototype/out/build/x64-Debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_eab54 && [1/2] Building CXX object CMakeFiles\cmTC_eab54.dir\CMakeCXXCompilerABI.cpp.obj
+[2/2] Linking CXX executable cmTC_eab54.exe
+FAILED: cmTC_eab54.exe 
+cmd.exe /C "cd . && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_eab54.dir --rc=rc --mt=CMAKE_MT-NOTFOUND --manifests  -- C:\PROGRA~2\MICROS~2\2019\COMMUN~1\VC\Tools\MSVC\1429~1.301\bin\Hostx64\x64\link.exe /nologo CMakeFiles\cmTC_eab54.dir\CMakeCXXCompilerABI.cpp.obj  /out:cmTC_eab54.exe /implib:cmTC_eab54.lib /pdb:cmTC_eab54.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+RC Pass 1: command "rc /fo CMakeFiles\cmTC_eab54.dir/manifest.res CMakeFiles\cmTC_eab54.dir/manifest.rc" failed (exit code 0) with the following output:
+Das System kann die angegebene Datei nicht finden
+ninja: build stopped: subcommand failed.
+
+
+
+
+Determining if the CXX compiler works failed with the following output:
+Change Dir: C:/Users/Supervisor/source/repos/bricks_cpp_prototype/out/build/x64-Debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_d0bf0 && [1/2] Building CXX object CMakeFiles\cmTC_d0bf0.dir\testCXXCompiler.cxx.obj
+[2/2] Linking CXX executable cmTC_d0bf0.exe
+FAILED: cmTC_d0bf0.exe 
+cmd.exe /C "cd . && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_d0bf0.dir --rc=rc --mt=CMAKE_MT-NOTFOUND --manifests  -- C:\PROGRA~2\MICROS~2\2019\COMMUN~1\VC\Tools\MSVC\1429~1.301\bin\Hostx64\x64\link.exe /nologo CMakeFiles\cmTC_d0bf0.dir\testCXXCompiler.cxx.obj  /out:cmTC_d0bf0.exe /implib:cmTC_d0bf0.lib /pdb:cmTC_d0bf0.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+RC Pass 1: command "rc /fo CMakeFiles\cmTC_d0bf0.dir/manifest.res CMakeFiles\cmTC_d0bf0.dir/manifest.rc" failed (exit code 0) with the following output:
+Das System kann die angegebene Datei nicht finden
+ninja: build stopped: subcommand failed.
+
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64/cl.exe 
+Build flags: /DWIN32;/D_WINDOWS;/GR;/EHsc
+Id flags:  
+
+The output was:
+2
+Microsoft (R) C/C++-Optimierungscompiler Version 19.29.30159 für x64
+Copyright (C) Microsoft Corporation. Alle Rechte vorbehalten.
+
+CMakeCXXCompilerId.cpp
+Microsoft (R) Incremental Linker Version 14.29.30159.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+/out:CMakeCXXCompilerId.exe 
+CMakeCXXCompilerId.obj 
+LINK : fatal error LNK1104: Datei "kernel32.lib" kann nicht geöffnet werden.
+
+
+Detecting CXX compiler ABI info failed to compile with the following output:
+Change Dir: C:/Users/Supervisor/source/repos/bricks_cpp_prototype/out/build/x64-Debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_dc696 && [1/2] Building CXX object CMakeFiles\cmTC_dc696.dir\CMakeCXXCompilerABI.cpp.obj
+[2/2] Linking CXX executable cmTC_dc696.exe
+FAILED: cmTC_dc696.exe 
+cmd.exe /C "cd . && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_dc696.dir --rc=rc --mt=CMAKE_MT-NOTFOUND --manifests  -- C:\PROGRA~2\MICROS~2\2019\COMMUN~1\VC\Tools\MSVC\1429~1.301\bin\Hostx64\x64\link.exe /nologo CMakeFiles\cmTC_dc696.dir\CMakeCXXCompilerABI.cpp.obj  /out:cmTC_dc696.exe /implib:cmTC_dc696.lib /pdb:cmTC_dc696.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+RC Pass 1: command "rc /fo CMakeFiles\cmTC_dc696.dir/manifest.res CMakeFiles\cmTC_dc696.dir/manifest.rc" failed (exit code 0) with the following output:
+Das System kann die angegebene Datei nicht finden
+ninja: build stopped: subcommand failed.
+
+
+
+
+Determining if the CXX compiler works failed with the following output:
+Change Dir: C:/Users/Supervisor/source/repos/bricks_cpp_prototype/out/build/x64-Debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_8d192 && [1/2] Building CXX object CMakeFiles\cmTC_8d192.dir\testCXXCompiler.cxx.obj
+[2/2] Linking CXX executable cmTC_8d192.exe
+FAILED: cmTC_8d192.exe 
+cmd.exe /C "cd . && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_8d192.dir --rc=rc --mt=CMAKE_MT-NOTFOUND --manifests  -- C:\PROGRA~2\MICROS~2\2019\COMMUN~1\VC\Tools\MSVC\1429~1.301\bin\Hostx64\x64\link.exe /nologo CMakeFiles\cmTC_8d192.dir\testCXXCompiler.cxx.obj  /out:cmTC_8d192.exe /implib:cmTC_8d192.lib /pdb:cmTC_8d192.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+RC Pass 1: command "rc /fo CMakeFiles\cmTC_8d192.dir/manifest.res CMakeFiles\cmTC_8d192.dir/manifest.rc" failed (exit code 0) with the following output:
+Das System kann die angegebene Datei nicht finden
+ninja: build stopped: subcommand failed.
+
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64/cl.exe 
+Build flags: /DWIN32;/D_WINDOWS;/GR;/EHsc
+Id flags:  
+
+The output was:
+2
+Microsoft (R) C/C++-Optimierungscompiler Version 19.29.30159 für x64
+Copyright (C) Microsoft Corporation. Alle Rechte vorbehalten.
+
+CMakeCXXCompilerId.cpp
+Microsoft (R) Incremental Linker Version 14.29.30159.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+/out:CMakeCXXCompilerId.exe 
+CMakeCXXCompilerId.obj 
+LINK : fatal error LNK1104: Datei "kernel32.lib" kann nicht geöffnet werden.
+
+
+Detecting CXX compiler ABI info failed to compile with the following output:
+Change Dir: C:/Users/Supervisor/source/repos/bricks_cpp_prototype/out/build/x64-Debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_adf37 && [1/2] Building CXX object CMakeFiles\cmTC_adf37.dir\CMakeCXXCompilerABI.cpp.obj
+[2/2] Linking CXX executable cmTC_adf37.exe
+FAILED: cmTC_adf37.exe 
+cmd.exe /C "cd . && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_adf37.dir --rc=rc --mt=CMAKE_MT-NOTFOUND --manifests  -- C:\PROGRA~2\MICROS~2\2019\COMMUN~1\VC\Tools\MSVC\1429~1.301\bin\Hostx64\x64\link.exe /nologo CMakeFiles\cmTC_adf37.dir\CMakeCXXCompilerABI.cpp.obj  /out:cmTC_adf37.exe /implib:cmTC_adf37.lib /pdb:cmTC_adf37.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+RC Pass 1: command "rc /fo CMakeFiles\cmTC_adf37.dir/manifest.res CMakeFiles\cmTC_adf37.dir/manifest.rc" failed (exit code 0) with the following output:
+Das System kann die angegebene Datei nicht finden
+ninja: build stopped: subcommand failed.
+
+
+
+
+Determining if the CXX compiler works failed with the following output:
+Change Dir: C:/Users/Supervisor/source/repos/bricks_cpp_prototype/out/build/x64-Debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_63fbc && [1/2] Building CXX object CMakeFiles\cmTC_63fbc.dir\testCXXCompiler.cxx.obj
+[2/2] Linking CXX executable cmTC_63fbc.exe
+FAILED: cmTC_63fbc.exe 
+cmd.exe /C "cd . && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_63fbc.dir --rc=rc --mt=CMAKE_MT-NOTFOUND --manifests  -- C:\PROGRA~2\MICROS~2\2019\COMMUN~1\VC\Tools\MSVC\1429~1.301\bin\Hostx64\x64\link.exe /nologo CMakeFiles\cmTC_63fbc.dir\testCXXCompiler.cxx.obj  /out:cmTC_63fbc.exe /implib:cmTC_63fbc.lib /pdb:cmTC_63fbc.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+RC Pass 1: command "rc /fo CMakeFiles\cmTC_63fbc.dir/manifest.res CMakeFiles\cmTC_63fbc.dir/manifest.rc" failed (exit code 0) with the following output:
+Das System kann die angegebene Datei nicht finden
+ninja: build stopped: subcommand failed.
+
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64/cl.exe 
+Build flags: /DWIN32;/D_WINDOWS;/GR;/EHsc
+Id flags:  
+
+The output was:
+2
+Microsoft (R) C/C++-Optimierungscompiler Version 19.29.30159 für x64
+Copyright (C) Microsoft Corporation. Alle Rechte vorbehalten.
+
+CMakeCXXCompilerId.cpp
+Microsoft (R) Incremental Linker Version 14.29.30159.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+/out:CMakeCXXCompilerId.exe 
+CMakeCXXCompilerId.obj 
+LINK : fatal error LNK1104: Datei "kernel32.lib" kann nicht geöffnet werden.
+
+
+Detecting CXX compiler ABI info failed to compile with the following output:
+Change Dir: C:/Users/Supervisor/source/repos/bricks_cpp_prototype/out/build/x64-Debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_a9b54 && [1/2] Building CXX object CMakeFiles\cmTC_a9b54.dir\CMakeCXXCompilerABI.cpp.obj
+[2/2] Linking CXX executable cmTC_a9b54.exe
+FAILED: cmTC_a9b54.exe 
+cmd.exe /C "cd . && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_a9b54.dir --rc=rc --mt=CMAKE_MT-NOTFOUND --manifests  -- C:\PROGRA~2\MICROS~2\2019\COMMUN~1\VC\Tools\MSVC\1429~1.301\bin\Hostx64\x64\link.exe /nologo CMakeFiles\cmTC_a9b54.dir\CMakeCXXCompilerABI.cpp.obj  /out:cmTC_a9b54.exe /implib:cmTC_a9b54.lib /pdb:cmTC_a9b54.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+RC Pass 1: command "rc /fo CMakeFiles\cmTC_a9b54.dir/manifest.res CMakeFiles\cmTC_a9b54.dir/manifest.rc" failed (exit code 0) with the following output:
+Das System kann die angegebene Datei nicht finden
+ninja: build stopped: subcommand failed.
+
+
+
+
+Determining if the CXX compiler works failed with the following output:
+Change Dir: C:/Users/Supervisor/source/repos/bricks_cpp_prototype/out/build/x64-Debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_d9a3a && [1/2] Building CXX object CMakeFiles\cmTC_d9a3a.dir\testCXXCompiler.cxx.obj
+[2/2] Linking CXX executable cmTC_d9a3a.exe
+FAILED: cmTC_d9a3a.exe 
+cmd.exe /C "cd . && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_d9a3a.dir --rc=rc --mt=CMAKE_MT-NOTFOUND --manifests  -- C:\PROGRA~2\MICROS~2\2019\COMMUN~1\VC\Tools\MSVC\1429~1.301\bin\Hostx64\x64\link.exe /nologo CMakeFiles\cmTC_d9a3a.dir\testCXXCompiler.cxx.obj  /out:cmTC_d9a3a.exe /implib:cmTC_d9a3a.lib /pdb:cmTC_d9a3a.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+RC Pass 1: command "rc /fo CMakeFiles\cmTC_d9a3a.dir/manifest.res CMakeFiles\cmTC_d9a3a.dir/manifest.rc" failed (exit code 0) with the following output:
+Das System kann die angegebene Datei nicht finden
+ninja: build stopped: subcommand failed.
+
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64/cl.exe 
+Build flags: /DWIN32;/D_WINDOWS;/GR;/EHsc
+Id flags:  
+
+The output was:
+2
+Microsoft (R) C/C++-Optimierungscompiler Version 19.29.30159 für x64
+Copyright (C) Microsoft Corporation. Alle Rechte vorbehalten.
+
+CMakeCXXCompilerId.cpp
+Microsoft (R) Incremental Linker Version 14.29.30159.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+/out:CMakeCXXCompilerId.exe 
+CMakeCXXCompilerId.obj 
+LINK : fatal error LNK1104: Datei "kernel32.lib" kann nicht geöffnet werden.
+
+
+Detecting CXX compiler ABI info failed to compile with the following output:
+Change Dir: C:/Users/Supervisor/source/repos/bricks_cpp_prototype/out/build/x64-Debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_c299f && [1/2] Building CXX object CMakeFiles\cmTC_c299f.dir\CMakeCXXCompilerABI.cpp.obj
+[2/2] Linking CXX executable cmTC_c299f.exe
+FAILED: cmTC_c299f.exe 
+cmd.exe /C "cd . && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_c299f.dir --rc=rc --mt=CMAKE_MT-NOTFOUND --manifests  -- C:\PROGRA~2\MICROS~2\2019\COMMUN~1\VC\Tools\MSVC\1429~1.301\bin\Hostx64\x64\link.exe /nologo CMakeFiles\cmTC_c299f.dir\CMakeCXXCompilerABI.cpp.obj  /out:cmTC_c299f.exe /implib:cmTC_c299f.lib /pdb:cmTC_c299f.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+RC Pass 1: command "rc /fo CMakeFiles\cmTC_c299f.dir/manifest.res CMakeFiles\cmTC_c299f.dir/manifest.rc" failed (exit code 0) with the following output:
+Das System kann die angegebene Datei nicht finden
+ninja: build stopped: subcommand failed.
+
+
+
+
+Determining if the CXX compiler works failed with the following output:
+Change Dir: C:/Users/Supervisor/source/repos/bricks_cpp_prototype/out/build/x64-Debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_21c8e && [1/2] Building CXX object CMakeFiles\cmTC_21c8e.dir\testCXXCompiler.cxx.obj
+[2/2] Linking CXX executable cmTC_21c8e.exe
+FAILED: cmTC_21c8e.exe 
+cmd.exe /C "cd . && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_21c8e.dir --rc=rc --mt=CMAKE_MT-NOTFOUND --manifests  -- C:\PROGRA~2\MICROS~2\2019\COMMUN~1\VC\Tools\MSVC\1429~1.301\bin\Hostx64\x64\link.exe /nologo CMakeFiles\cmTC_21c8e.dir\testCXXCompiler.cxx.obj  /out:cmTC_21c8e.exe /implib:cmTC_21c8e.lib /pdb:cmTC_21c8e.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+RC Pass 1: command "rc /fo CMakeFiles\cmTC_21c8e.dir/manifest.res CMakeFiles\cmTC_21c8e.dir/manifest.rc" failed (exit code 0) with the following output:
+Das System kann die angegebene Datei nicht finden
+ninja: build stopped: subcommand failed.
+
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64/cl.exe 
+Build flags: /DWIN32;/D_WINDOWS;/GR;/EHsc
+Id flags:  
+
+The output was:
+2
+Microsoft (R) C/C++-Optimierungscompiler Version 19.29.30159 für x64
+Copyright (C) Microsoft Corporation. Alle Rechte vorbehalten.
+
+CMakeCXXCompilerId.cpp
+Microsoft (R) Incremental Linker Version 14.29.30159.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+/out:CMakeCXXCompilerId.exe 
+CMakeCXXCompilerId.obj 
+LINK : fatal error LNK1104: Datei "kernel32.lib" kann nicht geöffnet werden.
+
+
+Detecting CXX compiler ABI info failed to compile with the following output:
+Change Dir: C:/Users/Supervisor/source/repos/bricks_cpp_prototype/out/build/x64-Debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_ac03e && [1/2] Building CXX object CMakeFiles\cmTC_ac03e.dir\CMakeCXXCompilerABI.cpp.obj
+[2/2] Linking CXX executable cmTC_ac03e.exe
+FAILED: cmTC_ac03e.exe 
+cmd.exe /C "cd . && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_ac03e.dir --rc=rc --mt=CMAKE_MT-NOTFOUND --manifests  -- C:\PROGRA~2\MICROS~2\2019\COMMUN~1\VC\Tools\MSVC\1429~1.301\bin\Hostx64\x64\link.exe /nologo CMakeFiles\cmTC_ac03e.dir\CMakeCXXCompilerABI.cpp.obj  /out:cmTC_ac03e.exe /implib:cmTC_ac03e.lib /pdb:cmTC_ac03e.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+RC Pass 1: command "rc /fo CMakeFiles\cmTC_ac03e.dir/manifest.res CMakeFiles\cmTC_ac03e.dir/manifest.rc" failed (exit code 0) with the following output:
+Das System kann die angegebene Datei nicht finden
+ninja: build stopped: subcommand failed.
+
+
+
+
+Determining if the CXX compiler works failed with the following output:
+Change Dir: C:/Users/Supervisor/source/repos/bricks_cpp_prototype/out/build/x64-Debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_2bdc8 && [1/2] Building CXX object CMakeFiles\cmTC_2bdc8.dir\testCXXCompiler.cxx.obj
+[2/2] Linking CXX executable cmTC_2bdc8.exe
+FAILED: cmTC_2bdc8.exe 
+cmd.exe /C "cd . && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_2bdc8.dir --rc=rc --mt=CMAKE_MT-NOTFOUND --manifests  -- C:\PROGRA~2\MICROS~2\2019\COMMUN~1\VC\Tools\MSVC\1429~1.301\bin\Hostx64\x64\link.exe /nologo CMakeFiles\cmTC_2bdc8.dir\testCXXCompiler.cxx.obj  /out:cmTC_2bdc8.exe /implib:cmTC_2bdc8.lib /pdb:cmTC_2bdc8.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+RC Pass 1: command "rc /fo CMakeFiles\cmTC_2bdc8.dir/manifest.res CMakeFiles\cmTC_2bdc8.dir/manifest.rc" failed (exit code 0) with the following output:
+Das System kann die angegebene Datei nicht finden
+ninja: build stopped: subcommand failed.
+
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64/cl.exe 
+Build flags: /DWIN32;/D_WINDOWS;/GR;/EHsc
+Id flags:  
+
+The output was:
+2
+Microsoft (R) C/C++-Optimierungscompiler Version 19.29.30159 für x64
+Copyright (C) Microsoft Corporation. Alle Rechte vorbehalten.
+
+CMakeCXXCompilerId.cpp
+Microsoft (R) Incremental Linker Version 14.29.30159.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+/out:CMakeCXXCompilerId.exe 
+CMakeCXXCompilerId.obj 
+LINK : fatal error LNK1104: Datei "kernel32.lib" kann nicht geöffnet werden.
+
+
+Detecting CXX compiler ABI info failed to compile with the following output:
+Change Dir: C:/Users/Supervisor/source/repos/bricks_cpp_prototype/out/build/x64-Debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_13b0b && [1/2] Building CXX object CMakeFiles\cmTC_13b0b.dir\CMakeCXXCompilerABI.cpp.obj
+[2/2] Linking CXX executable cmTC_13b0b.exe
+FAILED: cmTC_13b0b.exe 
+cmd.exe /C "cd . && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_13b0b.dir --rc=rc --mt=CMAKE_MT-NOTFOUND --manifests  -- C:\PROGRA~2\MICROS~2\2019\COMMUN~1\VC\Tools\MSVC\1429~1.301\bin\Hostx64\x64\link.exe /nologo CMakeFiles\cmTC_13b0b.dir\CMakeCXXCompilerABI.cpp.obj  /out:cmTC_13b0b.exe /implib:cmTC_13b0b.lib /pdb:cmTC_13b0b.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+RC Pass 1: command "rc /fo CMakeFiles\cmTC_13b0b.dir/manifest.res CMakeFiles\cmTC_13b0b.dir/manifest.rc" failed (exit code 0) with the following output:
+Das System kann die angegebene Datei nicht finden
+ninja: build stopped: subcommand failed.
+
+
+
+
+Determining if the CXX compiler works failed with the following output:
+Change Dir: C:/Users/Supervisor/source/repos/bricks_cpp_prototype/out/build/x64-Debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_2fce0 && [1/2] Building CXX object CMakeFiles\cmTC_2fce0.dir\testCXXCompiler.cxx.obj
+[2/2] Linking CXX executable cmTC_2fce0.exe
+FAILED: cmTC_2fce0.exe 
+cmd.exe /C "cd . && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_2fce0.dir --rc=rc --mt=CMAKE_MT-NOTFOUND --manifests  -- C:\PROGRA~2\MICROS~2\2019\COMMUN~1\VC\Tools\MSVC\1429~1.301\bin\Hostx64\x64\link.exe /nologo CMakeFiles\cmTC_2fce0.dir\testCXXCompiler.cxx.obj  /out:cmTC_2fce0.exe /implib:cmTC_2fce0.lib /pdb:cmTC_2fce0.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+RC Pass 1: command "rc /fo CMakeFiles\cmTC_2fce0.dir/manifest.res CMakeFiles\cmTC_2fce0.dir/manifest.rc" failed (exit code 0) with the following output:
+Das System kann die angegebene Datei nicht finden
+ninja: build stopped: subcommand failed.
+
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64/cl.exe 
+Build flags: /DWIN32;/D_WINDOWS;/GR;/EHsc
+Id flags:  
+
+The output was:
+2
+Microsoft (R) C/C++-Optimierungscompiler Version 19.29.30159 für x64
+Copyright (C) Microsoft Corporation. Alle Rechte vorbehalten.
+
+CMakeCXXCompilerId.cpp
+Microsoft (R) Incremental Linker Version 14.29.30159.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+/out:CMakeCXXCompilerId.exe 
+CMakeCXXCompilerId.obj 
+LINK : fatal error LNK1104: Datei "kernel32.lib" kann nicht geöffnet werden.
+
+
+Detecting CXX compiler ABI info failed to compile with the following output:
+Change Dir: C:/Users/Supervisor/source/repos/bricks_cpp_prototype/out/build/x64-Debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_dfdd5 && [1/2] Building CXX object CMakeFiles\cmTC_dfdd5.dir\CMakeCXXCompilerABI.cpp.obj
+[2/2] Linking CXX executable cmTC_dfdd5.exe
+FAILED: cmTC_dfdd5.exe 
+cmd.exe /C "cd . && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_dfdd5.dir --rc=rc --mt=CMAKE_MT-NOTFOUND --manifests  -- C:\PROGRA~2\MICROS~2\2019\COMMUN~1\VC\Tools\MSVC\1429~1.301\bin\Hostx64\x64\link.exe /nologo CMakeFiles\cmTC_dfdd5.dir\CMakeCXXCompilerABI.cpp.obj  /out:cmTC_dfdd5.exe /implib:cmTC_dfdd5.lib /pdb:cmTC_dfdd5.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+RC Pass 1: command "rc /fo CMakeFiles\cmTC_dfdd5.dir/manifest.res CMakeFiles\cmTC_dfdd5.dir/manifest.rc" failed (exit code 0) with the following output:
+Das System kann die angegebene Datei nicht finden
+ninja: build stopped: subcommand failed.
+
+
+
+
+Determining if the CXX compiler works failed with the following output:
+Change Dir: C:/Users/Supervisor/source/repos/bricks_cpp_prototype/out/build/x64-Debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_9e624 && [1/2] Building CXX object CMakeFiles\cmTC_9e624.dir\testCXXCompiler.cxx.obj
+[2/2] Linking CXX executable cmTC_9e624.exe
+FAILED: cmTC_9e624.exe 
+cmd.exe /C "cd . && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_9e624.dir --rc=rc --mt=CMAKE_MT-NOTFOUND --manifests  -- C:\PROGRA~2\MICROS~2\2019\COMMUN~1\VC\Tools\MSVC\1429~1.301\bin\Hostx64\x64\link.exe /nologo CMakeFiles\cmTC_9e624.dir\testCXXCompiler.cxx.obj  /out:cmTC_9e624.exe /implib:cmTC_9e624.lib /pdb:cmTC_9e624.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+RC Pass 1: command "rc /fo CMakeFiles\cmTC_9e624.dir/manifest.res CMakeFiles\cmTC_9e624.dir/manifest.rc" failed (exit code 0) with the following output:
+Das System kann die angegebene Datei nicht finden
+ninja: build stopped: subcommand failed.
+
+
+
+Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+Compiler: C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.29.30133/bin/Hostx64/x64/cl.exe 
+Build flags: /DWIN32;/D_WINDOWS;/GR;/EHsc
+Id flags:  
+
+The output was:
+2
+Microsoft (R) C/C++-Optimierungscompiler Version 19.29.30159 für x64
+Copyright (C) Microsoft Corporation. Alle Rechte vorbehalten.
+
+CMakeCXXCompilerId.cpp
+Microsoft (R) Incremental Linker Version 14.29.30159.0
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+/out:CMakeCXXCompilerId.exe 
+CMakeCXXCompilerId.obj 
+LINK : fatal error LNK1104: Datei "kernel32.lib" kann nicht geöffnet werden.
+
+
+Detecting CXX compiler ABI info failed to compile with the following output:
+Change Dir: C:/Users/Supervisor/source/repos/bricks_cpp_prototype/out/build/x64-Debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_a8d9b && [1/2] Building CXX object CMakeFiles\cmTC_a8d9b.dir\CMakeCXXCompilerABI.cpp.obj
+[2/2] Linking CXX executable cmTC_a8d9b.exe
+FAILED: cmTC_a8d9b.exe 
+cmd.exe /C "cd . && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_a8d9b.dir --rc=rc --mt=CMAKE_MT-NOTFOUND --manifests  -- C:\PROGRA~2\MICROS~2\2019\COMMUN~1\VC\Tools\MSVC\1429~1.301\bin\Hostx64\x64\link.exe /nologo CMakeFiles\cmTC_a8d9b.dir\CMakeCXXCompilerABI.cpp.obj  /out:cmTC_a8d9b.exe /implib:cmTC_a8d9b.lib /pdb:cmTC_a8d9b.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+RC Pass 1: command "rc /fo CMakeFiles\cmTC_a8d9b.dir/manifest.res CMakeFiles\cmTC_a8d9b.dir/manifest.rc" failed (exit code 0) with the following output:
+Das System kann die angegebene Datei nicht finden
+ninja: build stopped: subcommand failed.
+
+
+
+
+Determining if the CXX compiler works failed with the following output:
+Change Dir: C:/Users/Supervisor/source/repos/bricks_cpp_prototype/out/build/x64-Debug/CMakeFiles/CMakeTmp
+
+Run Build Command(s):C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe cmTC_7f65f && [1/2] Building CXX object CMakeFiles\cmTC_7f65f.dir\testCXXCompiler.cxx.obj
+[2/2] Linking CXX executable cmTC_7f65f.exe
+FAILED: cmTC_7f65f.exe 
+cmd.exe /C "cd . && "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_7f65f.dir --rc=rc --mt=CMAKE_MT-NOTFOUND --manifests  -- C:\PROGRA~2\MICROS~2\2019\COMMUN~1\VC\Tools\MSVC\1429~1.301\bin\Hostx64\x64\link.exe /nologo CMakeFiles\cmTC_7f65f.dir\testCXXCompiler.cxx.obj  /out:cmTC_7f65f.exe /implib:cmTC_7f65f.lib /pdb:cmTC_7f65f.pdb /version:0.0 /machine:x64  /debug /INCREMENTAL /subsystem:console  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib && cd ."
+RC Pass 1: command "rc /fo CMakeFiles\cmTC_7f65f.dir/manifest.res CMakeFiles\cmTC_7f65f.dir/manifest.rc" failed (exit code 0) with the following output:
+Das System kann die angegebene Datei nicht finden
+ninja: build stopped: subcommand failed.
+
+
+

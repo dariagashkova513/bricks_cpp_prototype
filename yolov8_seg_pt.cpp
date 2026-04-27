@@ -1,4 +1,4 @@
-#include "yolov8seg.hpp"
+#include "include/yolov8_seg_pt.hpp"
 
 #include <algorithm>
 #include <cassert>
