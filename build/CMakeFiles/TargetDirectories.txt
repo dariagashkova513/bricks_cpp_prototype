@@ -1,3 +1,0 @@
-C:/Users/Supervisor/source/repos/bricks_cpp_prototype/build/CMakeFiles/yolov8_seg.dir
-C:/Users/Supervisor/source/repos/bricks_cpp_prototype/build/CMakeFiles/ALL_BUILD.dir
-C:/Users/Supervisor/source/repos/bricks_cpp_prototype/build/CMakeFiles/ZERO_CHECK.dir
