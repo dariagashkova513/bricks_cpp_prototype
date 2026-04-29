@@ -5,15 +5,35 @@
 #include <cmath>
 #include <numeric>
 #include <stdexcept>
+#include <filesystem>
+
+//=============================================================
+// TODO
+// 1 tiling Algorithmus
+// 2 1 großes Bild mit Tile ersetzen
+// 3 test auf geri nord jetzt
+// 4 erneut trainierte model einsetzen
+// 5 mehrere tests
+//=============================================================
+
+
 
 // ============================================================
 //  Colour palette
 // ============================================================
 
 const cv::Scalar YOLOv8Seg::kPalette[kPaletteSize] = {
-    {255,  56,  56}
+    {255,  128,  256}
 };
 
+
+static Ort::SessionOptions make_session_opts()
+{
+    Ort::SessionOptions opts;
+    opts.SetIntraOpNumThreads(1);
+    opts.SetGraphOptimizationLevel(GraphOptimizationLevel::ORT_ENABLE_EXTENDED);
+    return opts;
+}
 // ============================================================
 //  Constructor
 // ============================================================
@@ -23,27 +43,52 @@ YOLOv8Seg::YOLOv8Seg(const std::string& model_path,
     float iou_thresh,
     int   input_size)
     : env_(ORT_LOGGING_LEVEL_WARNING, "YOLOv8Seg"),
-      session_opts_(),
-      session_(nullptr),
+      session_opts_(make_session_opts()),
+      session_(env_,
+      std::filesystem::path(model_path).wstring().c_str(),
+      session_opts_),
       input_size_(input_size),
       conf_thresh_(conf_thresh),
       iou_thresh_(iou_thresh)
 {
-    session_opts_.SetIntraOpNumThreads(1);
-    session_opts_.SetGraphOptimizationLevel(
-        GraphOptimizationLevel::ORT_ENABLE_EXTENDED);
-
-    // Windows: char → wchar_t
-    std::wstring wpath(model_path.begin(), model_path.end());
-
-    session_ = Ort::Session(env_, model_path.c_str(), session_opts_);
-
     // Input name
     { auto r = session_.GetInputNameAllocated(0, allocator_);  input_name_   = r.get(); }
     // Two outputs: detection tensor + prototype masks
     { auto r = session_.GetOutputNameAllocated(0, allocator_); output0_name_ = r.get(); }
     { auto r = session_.GetOutputNameAllocated(1, allocator_); output1_name_ = r.get(); }
 }
+
+
+std::vector<Tile> YOLOv8Seg::tiling(const cv::Mat& image, int size=640, int step=512)const
+{   
+    std::vector<Tile> tiles;
+    if (image.rows == image.cols == size) {
+        tiles.push_back({image, size, size, size, size});
+        return tiles;
+    }
+
+    for (int y = 0; y < image.rows; y += step) {
+        for (int x = 0; x < image.cols; x += step) { 
+
+            const int valid_w = std::min(size, image.cols - x);
+            const int valid_h = std::min(size, image.rows - y);
+
+            // Gray canvas — same pad colour as preprocess
+            cv::Mat canvas(size, size, image.type(), cv::Scalar(114, 114, 114));
+            image(cv::Rect(x, y, valid_w, valid_h))
+                .copyTo(canvas(cv::Rect(0, 0, valid_w, valid_h)));
+
+            std::cout << "cut out the tile #"<<y<<"\n";
+
+            tiles.push_back({ canvas, x, y, valid_w, valid_h });
+        }
+    }
+
+    return tiles;
+
+}
+
+
 
 // ============================================================
 //  preprocess  — letterbox + NCHW float32
@@ -76,57 +121,102 @@ cv::Mat YOLOv8Seg::preprocess(const cv::Mat& image,
 //  detect
 // ============================================================
 
-std::vector<SegDetection> YOLOv8Seg::detect(const cv::Mat& image)
+std::vector<SegDetection> YOLOv8Seg::detect(
+    const cv::Mat& image
+)
 {
     if (image.empty())
         throw std::runtime_error("YOLOv8Seg::detect — empty image");
 
+ 
+
     const int orig_w = image.cols;
     const int orig_h = image.rows;
 
-    float scale = 0.f;
-    int   pad_w = 0, pad_h = 0;
-    cv::Mat blob = preprocess(image, scale, pad_w, pad_h);
+    const auto tiles = tiling(image);
+    std::vector<SegDetection> all_detections;
 
-    // Build input tensor
-    const std::array<int64_t, 4> input_shape{1, 3, input_size_, input_size_};
-    Ort::MemoryInfo mem_info =
-        Ort::MemoryInfo::CreateCpu(OrtArenaAllocator, OrtMemTypeDefault);
+    for (const auto& tile : tiles) {
 
-    Ort::Value input_tensor = Ort::Value::CreateTensor<float>(
-        mem_info,
-        reinterpret_cast<float*>(blob.data),
-        static_cast<size_t>(blob.total()),
-        input_shape.data(), input_shape.size());
+        float scale = 0.f;
+        int pad_w, pad_h = 0;
+        cv::Mat blob = preprocess(image, scale, pad_w, pad_h);
 
-    const char* input_names[]  = { input_name_.c_str() };
-    const char* output_names[] = { output0_name_.c_str(), output1_name_.c_str() };
+        // Build input tensor
+        const std::array<int64_t, 4> input_shape{ 1, 3, input_size_, input_size_ };
+        Ort::MemoryInfo mem_info =
+            Ort::MemoryInfo::CreateCpu(OrtArenaAllocator, OrtMemTypeDefault);
 
-    auto outputs = session_.Run(
-        Ort::RunOptions{nullptr},
-        input_names,  &input_tensor, 1,
-        output_names, 2);
+        Ort::Value input_tensor = Ort::Value::CreateTensor<float>(
+            mem_info,
+            reinterpret_cast<float*>(blob.data),
+            static_cast<size_t>(blob.total()),
+            input_shape.data(), input_shape.size());
 
-    // ---- output0: [1, 4+nc+nm, na] ----
-    auto shape0 = outputs[0].GetTensorTypeAndShapeInfo().GetShape();
-    // shape0 = [1, rows, num_anchors]
-    // rows   = 4 (box) + num_classes + nm (mask coeffs, usually 32)
-    const int64_t num_anchors = shape0[2];
+        const char* input_names[] = { input_name_.c_str() };
+        const char* output_names[] = { output0_name_.c_str(), output1_name_.c_str() };
 
-    // ---- output1: [1, nm, proto_h, proto_w] ----
-    auto shape1 = outputs[1].GetTensorTypeAndShapeInfo().GetShape();
-    const int64_t nm      = shape1[1];
-    const int     proto_h = static_cast<int>(shape1[2]);
-    const int     proto_w = static_cast<int>(shape1[3]);
+        auto outputs = session_.Run(
+            Ort::RunOptions{ nullptr },
+            input_names, &input_tensor, 1,
+            output_names, 2);
 
-    const int64_t num_classes = shape0[1] - 4 - nm;
+        // ---- output0: [1, 4+nc+nm, na] ----
+        auto shape0 = outputs[0].GetTensorTypeAndShapeInfo().GetShape();
+        // shape0 = [1, rows, num_anchors]
+        // rows   = 4 (box) + num_classes + nm (mask coeffs, usually 32)
+        const int64_t num_anchors = shape0[2];
 
-    const float* det_data   = outputs[0].GetTensorData<float>();
-    const float* proto_data = outputs[1].GetTensorData<float>();
+        // ---- output1: [1, nm, proto_h, proto_w] ----
+        auto shape1 = outputs[1].GetTensorTypeAndShapeInfo().GetShape();
+        const int64_t nm = shape1[1];
+        const int     proto_h = static_cast<int>(shape1[2]);
+        const int     proto_w = static_cast<int>(shape1[3]);
 
-    return postprocess(det_data,   num_anchors, num_classes,
-                       proto_data, nm, proto_h, proto_w,
-                       scale, pad_w, pad_h, orig_w, orig_h);
+        const int64_t num_classes = shape0[1] - 4 - nm;
+
+        const float* det_data = outputs[0].GetTensorData<float>();
+        const float* proto_data = outputs[1].GetTensorData<float>();
+
+        // --- postprocess in tile-local coords ---
+        auto dets = postprocess(det_data, num_anchors, num_classes,
+            proto_data, nm, proto_h, proto_w,
+            scale, pad_w, pad_h,
+            tile.valid_w, tile.valid_h);
+
+        // --- remap boxes to global coords, store mask origin ---
+        for (auto& det : dets) {
+            det.box.x += tile.origin_x;
+            det.box.y += tile.origin_y;
+            det.mask_origin = { tile.origin_x, tile.origin_y };
+        }
+
+        all_detections.insert(all_detections.end(),
+            std::make_move_iterator(dets.begin()),
+            std::make_move_iterator(dets.end()));
+    }
+
+    // --- second NMS pass to remove cross-tile duplicates ---
+    std::vector<cv::Rect> all_boxes;
+    std::vector<float>    all_scores;
+    all_boxes.reserve(all_detections.size());
+    all_scores.reserve(all_detections.size());
+
+    for (const auto& d : all_detections) {
+        all_boxes.push_back(d.box);
+        all_scores.push_back(d.confidence);
+    }
+
+    std::vector<int> keep;
+    cv::dnn::NMSBoxes(all_boxes, all_scores, conf_thresh_, iou_thresh_, keep);
+
+    std::vector<SegDetection> final_detections;
+    final_detections.reserve(keep.size());
+    for (int i : keep)
+        final_detections.push_back(std::move(all_detections[i]));
+
+    return final_detections;
+
 }
 
 // ============================================================
@@ -162,15 +252,13 @@ cv::Mat YOLOv8Seg::assembleMask(const float*    proto_data,
     cv::exp(-combined, combined);            // combined = e^(-x)
     combined = 1.f / (1.f + combined);       // sigmoid
 
-    // 3. Scale the bounding box from original-image space -> proto space
-    //    proto is 1/4 of input_size, so proto_scale = proto_h / input_size
+    // 3. Map box from original-image space → proto space
     const float proto_scale_x = static_cast<float>(proto_w) / input_size_;
     const float proto_scale_y = static_cast<float>(proto_h) / input_size_;
 
-    // Convert box back to letterboxed-canvas coords
     const float lx1 = box.x * scale + pad_w;
     const float ly1 = box.y * scale + pad_h;
-    const float lx2 = (box.x + box.width)  * scale + pad_w;
+    const float lx2 = (box.x + box.width) * scale + pad_w;
     const float ly2 = (box.y + box.height) * scale + pad_h;
 
     const int px1 = std::clamp(static_cast<int>(lx1 * proto_scale_x), 0, proto_w - 1);
@@ -178,31 +266,27 @@ cv::Mat YOLOv8Seg::assembleMask(const float*    proto_data,
     const int px2 = std::clamp(static_cast<int>(std::ceil(lx2 * proto_scale_x)), px1 + 1, proto_w);
     const int py2 = std::clamp(static_cast<int>(std::ceil(ly2 * proto_scale_y)), py1 + 1, proto_h);
 
-    // 4. Crop to box region in proto space, resize to original image, threshold
+    // 4. Crop proto region and resize to box dimensions
     cv::Mat cropped = combined(cv::Rect(px1, py1, px2 - px1, py2 - py1)).clone();
 
-    cv::Mat resized_mask;
-    cv::resize(cropped, resized_mask, {box.width, box.height}, 0, 0, cv::INTER_LINEAR);
+    // Clamp box to tile bounds before resizing
+    const int safe_x = std::clamp(box.x, 0, orig_w - 1);
+    const int safe_y = std::clamp(box.y, 0, orig_h - 1);
+    const int safe_w = std::min(box.width, orig_w - safe_x);
+    const int safe_h = std::min(box.height, orig_h - safe_y);
 
-    // 5. Threshold at 0.5 -> binary mask sized to bounding box
+    if (safe_w <= 0 || safe_h <= 0)
+        return cv::Mat();   // degenerate box — return empty mask
+
+    cv::Mat resized_mask;
+    cv::resize(cropped, resized_mask, { safe_w, safe_h }, 0, 0, cv::INTER_LINEAR);
+
+    // 5. Threshold → binary CV_8U, sized to box
     cv::Mat binary;
     cv::threshold(resized_mask, binary, 0.5, 255, cv::THRESH_BINARY);
     binary.convertTo(binary, CV_8U);
 
-    // 6. Place in full-image canvas
-    cv::Mat full_mask = cv::Mat::zeros(orig_h, orig_w, CV_8U);
-    cv::Rect safe_box(
-        std::clamp(box.x, 0, orig_w - 1),
-        std::clamp(box.y, 0, orig_h - 1),
-        std::min(box.width,  orig_w - std::clamp(box.x, 0, orig_w - 1)),
-        std::min(box.height, orig_h - std::clamp(box.y, 0, orig_h - 1)));
-
-    if (safe_box.width > 0 && safe_box.height > 0) {
-        cv::Mat roi = binary(cv::Rect(0, 0, safe_box.width, safe_box.height));
-        roi.copyTo(full_mask(safe_box));
-    }
-
-    return full_mask;
+    return binary;  // tile-local, placed by draw() using mask_origin
 }
 
 // ============================================================
@@ -226,7 +310,7 @@ YOLOv8Seg::postprocess(const float* det_data,   int64_t num_anchors, int64_t num
     std::vector<int>       class_ids;
     std::vector<std::vector<float>> mask_coeffs_list;
 
-    const int64_t total_rows = 4 + num_classes + nm;
+    //const int64_t total_rows = 4 + num_classes + nm;
 
     for (int64_t a = 0; a < num_anchors; ++a) {
         // Best class score
@@ -248,10 +332,11 @@ YOLOv8Seg::postprocess(const float* det_data,   int64_t num_anchors, int64_t num
         auto unpad = [&](float v, float pad, float sc, int limit) -> int {
             return std::clamp(static_cast<int>((v - pad) / sc), 0, limit - 1);
         };
-        const int x1 = unpad(cx - bw / 2.f, pad_w, scale, orig_w);
-        const int y1 = unpad(cy - bh / 2.f, pad_h, scale, orig_h);
-        const int x2 = unpad(cx + bw / 2.f, pad_w, scale, orig_w);
-        const int y2 = unpad(cy + bh / 2.f, pad_h, scale, orig_h);
+
+        const int x1 = unpad(cx - bw / 2.f, static_cast<float>(pad_w), scale, orig_w);
+        const int y1 = unpad(cy - bh / 2.f, static_cast<float>(pad_h), scale, orig_h);
+        const int x2 = unpad(cx + bw / 2.f, static_cast<float>(pad_w), scale, orig_w);
+        const int y2 = unpad(cy + bh / 2.f, static_cast<float>(pad_h), scale, orig_h);
 
         // Mask coefficients
         std::vector<float> coeffs(nm);
@@ -297,21 +382,39 @@ cv::Mat YOLOv8Seg::draw(const cv::Mat&                   image,
 {
     cv::Mat out = image.clone();
 
+
+    // Allocate full-image buffers once and reuse per detection
+    cv::Mat full_mask = cv::Mat::zeros(image.size(), CV_8U);
+    cv::Mat colour_mask = cv::Mat::zeros(image.size(), CV_8UC3);
+    cv::Mat mask_overlay = cv::Mat::zeros(image.size(), CV_8UC3);
+
     for (size_t i = 0; i < detections.size(); ++i) {
         const auto& d      = detections[i];
         const cv::Scalar& colour = kPalette[i % kPaletteSize];
 
         // --- mask overlay ---
         if (!d.mask.empty()) {
-            cv::Mat colour_mask(image.size(), CV_8UC3, colour);
-            cv::Mat mask_overlay;
-            colour_mask.copyTo(mask_overlay, d.mask);   // only where mask != 0
-            cv::addWeighted(out, 1.0, mask_overlay, alpha, 0, out);
+            full_mask.setTo(0);
+
+            // Place tile-local mask at global position
+            const int rx = std::clamp(d.mask_origin.x, 0, image.cols);
+            const int ry = std::clamp(d.mask_origin.y, 0, image.rows);
+            const int rw = std::min(d.mask.cols, image.cols - rx);
+            const int rh = std::min(d.mask.rows, image.rows - ry);
+
+            if (rw > 0 && rh > 0)
+                d.mask(cv::Rect(0, 0, rw, rh))
+                .copyTo(full_mask(cv::Rect(rx, ry, rw, rh)));
+
+            colour_mask.setTo(colour);
+            colour_mask.copyTo(mask_overlay, full_mask);
+            cv::addWeighted(out, 1.0, mask_overlay, alpha, 0.0, out);
         }
+
 
         // --- bounding box ---
         cv::rectangle(out, d.box, colour, 2);
-
+        /*
         // --- label ---
         std::string label = class_names.empty()
             ? "cls" + std::to_string(d.class_id)
@@ -326,7 +429,7 @@ cv::Mat YOLOv8Seg::draw(const cv::Mat&                   image,
                        colour, cv::FILLED);
         cv::putText(out, label, {d.box.x, tl.y + tsz.height},
                     cv::FONT_HERSHEY_SIMPLEX, 0.6,
-                    cv::Scalar(0, 0, 0), 1, cv::LINE_AA);
+                    cv::Scalar(0, 0, 0), 1, cv::LINE_AA);*/
     }
 
     return out;

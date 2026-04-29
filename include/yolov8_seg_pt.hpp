@@ -15,7 +15,17 @@ struct SegDetection {
     float    confidence;
     cv::Rect box;       // bounding box in original-image pixel space
     cv::Mat  mask;      // binary mask (CV_8UC1), same size as original image
+    cv::Point mask_origin;
 };
+
+struct Tile {
+    cv::Mat image;      // 640x640 canvas (gray-padded at edges)
+    int     origin_x;   // top-left x in global image coords
+    int     origin_y;   // top-left y in global image coords
+    int     valid_w;    // actual content width  (< 640 at right border)
+    int     valid_h;    // actual content height (< 640 at bottom border)
+};
+
 
 // ---------------------------------------------------------------------------
 // YOLOv8-seg detector
@@ -40,6 +50,9 @@ public:
                  float                             alpha       = 0.45f) const;
 
 private:
+
+    std::vector<Tile> tiling(const cv::Mat& image, int size, int step) const;
+
     cv::Mat preprocess(const cv::Mat& image,
                        float& scale, int& pad_w, int& pad_h) const;
 
