@@ -62,8 +62,9 @@ YOLOv8Seg::YOLOv8Seg(const std::string& model_path,
 std::vector<Tile> YOLOv8Seg::tiling(const cv::Mat& image, int size=640, int step=512)const
 {   
     std::vector<Tile> tiles;
-    if (image.rows == image.cols == size) {
-        tiles.push_back({image, size, size, size, size});
+    if (image.rows==size && image.cols==size){
+        tiles.push_back({image.clone(), 0, 0, size, size});
+        std::cout << "return the tile early, the size passes\n";
         return tiles;
     }
 
@@ -137,10 +138,14 @@ std::vector<SegDetection> YOLOv8Seg::detect(
     std::vector<SegDetection> all_detections;
 
     for (const auto& tile : tiles) {
+        std::cout << "[Inference] Processing tile at (" << tile.origin_x
+            << ", " << tile.origin_y << ") size: " << tile.valid_w
+            << "x" << tile.valid_h << "..." << std::endl;
+
 
         float scale = 0.f;
         int pad_w, pad_h = 0;
-        cv::Mat blob = preprocess(image, scale, pad_w, pad_h);
+        cv::Mat blob = preprocess(tile.image, scale, pad_w, pad_h);
 
         // Build input tensor
         const std::array<int64_t, 4> input_shape{ 1, 3, input_size_, input_size_ };
@@ -184,6 +189,8 @@ std::vector<SegDetection> YOLOv8Seg::detect(
             scale, pad_w, pad_h,
             tile.valid_w, tile.valid_h);
 
+        //maybe get the couple of tiles' visualisaztion to see
+
         // --- remap boxes to global coords, store mask origin ---
         for (auto& det : dets) {
             det.box.x += tile.origin_x;
@@ -197,6 +204,7 @@ std::vector<SegDetection> YOLOv8Seg::detect(
     }
 
     // --- second NMS pass to remove cross-tile duplicates ---
+    std::cout << "started second NMS round ... \n";
     std::vector<cv::Rect> all_boxes;
     std::vector<float>    all_scores;
     all_boxes.reserve(all_detections.size());
@@ -214,7 +222,8 @@ std::vector<SegDetection> YOLOv8Seg::detect(
     final_detections.reserve(keep.size());
     for (int i : keep)
         final_detections.push_back(std::move(all_detections[i]));
-
+    
+    std::cout << "finished second NMS round \n";
     return final_detections;
 
 }
@@ -394,23 +403,33 @@ cv::Mat YOLOv8Seg::draw(const cv::Mat&                   image,
 
         // --- mask overlay ---
         if (!d.mask.empty()) {
-            full_mask.setTo(0);
+            // 1. Create a region of interest (ROI) in the output image based on the box
+            // We must intersect the box with the image boundaries to avoid crashes
+            cv::Rect image_rect(0, 0, out.cols, out.rows);
+            cv::Rect roi_rect = d.box & image_rect;
 
-            // Place tile-local mask at global position
-            const int rx = std::clamp(d.mask_origin.x, 0, image.cols);
-            const int ry = std::clamp(d.mask_origin.y, 0, image.rows);
-            const int rw = std::min(d.mask.cols, image.cols - rx);
-            const int rh = std::min(d.mask.rows, image.rows - ry);
+            if (roi_rect.width > 0 && roi_rect.height > 0) {
+                // 2. The mask might be slightly larger/smaller than the ROI if clipped
+                // Ensure the mask is resized to the exact ROI size
+                cv::Mat actual_mask;
+                if (d.mask.size() != roi_rect.size()) {
+                    cv::resize(d.mask, actual_mask, roi_rect.size());
+                }
+                else {
+                    actual_mask = d.mask;
+                }
 
-            if (rw > 0 && rh > 0)
-                d.mask(cv::Rect(0, 0, rw, rh))
-                .copyTo(full_mask(cv::Rect(rx, ry, rw, rh)));
+                // 3. Create the colored overlay for this specific ROI
+                cv::Mat roi_img = out(roi_rect);
+                cv::Mat color_roi(roi_rect.size(), CV_8UC3, colour);
 
-            colour_mask.setTo(colour);
-            colour_mask.copyTo(mask_overlay, full_mask);
-            cv::addWeighted(out, 1.0, mask_overlay, alpha, 0.0, out);
+                // 4. Blend only where the mask is positive
+                // Using cv::addWeighted on the ROI directly is more efficient
+                cv::Mat masked_overlay;
+                color_roi.copyTo(masked_overlay, actual_mask);
+                cv::addWeighted(roi_img, 1.0, masked_overlay, alpha, 0.0, roi_img);
+            }
         }
-
 
         // --- bounding box ---
         cv::rectangle(out, d.box, colour, 2);
