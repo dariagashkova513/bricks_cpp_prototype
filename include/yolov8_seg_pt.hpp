@@ -6,9 +6,17 @@
 #include <string>
 #include <vector>
 
+constexpr float CONF_POSTPROCESS = 0.85f;
 // ---------------------------------------------------------------------------
 // Data structures
 // ---------------------------------------------------------------------------
+
+struct WBFCluster {
+    std::vector<int>   members;   // indices into all_detections
+    cv::Rect2f         fused_box;
+    float              fused_score;
+    int                fused_class;
+};
 
 struct SegDetection {
     int      class_id;
@@ -38,11 +46,11 @@ struct Tile {
 class YOLOv8Seg {
 public:
     explicit YOLOv8Seg(const std::string& model_path,
-                       float conf_thresh = 0.25f,
-                       float iou_thresh  = 0.45f,
+                       float conf_thresh = 0.5f,
+                       float iou_thresh  = 0.15f,
                        int   input_size  = 640);
 
-    std::vector<SegDetection> detect(const cv::Mat& image);
+    std::vector<SegDetection> detect(const cv::Mat& image, const float conf_postprocess = CONF_POSTPROCESS);
 
     cv::Mat draw(const cv::Mat&                    image,
                  const std::vector<SegDetection>&  detections,
@@ -74,6 +82,14 @@ private:
                          float           scale,
                          int             pad_w,
                          int             pad_h) const;
+
+    std::vector<WBFCluster> wbf(
+        const std::vector<SegDetection>& detections,
+        int image_w, int image_h,
+        float iou_thr = 0.1f,
+        float skip_thr = 0.01f) const;
+
+    std::vector<SegDetection> delete_duplicates(const std::vector<SegDetection>& detections, const float iou_thresh_ = 0.05f) const;
 
     Ort::Env            env_;
     Ort::SessionOptions session_opts_;
