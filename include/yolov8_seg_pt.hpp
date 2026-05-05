@@ -91,6 +91,9 @@ private:
 
     std::vector<SegDetection> delete_duplicates(const std::vector<SegDetection>& detections, const float iou_thresh_ = 0.05f) const;
 
+    //statistische sort nach größe
+    std::vector<std::vector<SegDetection>> sort_detections(const std::vector<SegDetection>& detections) const;
+
     Ort::Env            env_;
     Ort::SessionOptions session_opts_;
     Ort::Session        session_;
@@ -104,6 +107,6 @@ private:
     float conf_thresh_;
     float iou_thresh_;
 
-    static constexpr int kPaletteSize = 1;
-    static const cv::Scalar kPalette[kPaletteSize];
+    //static constexpr int kPaletteSize = 1;
+    //static const cv::Scalar kPalette[kPaletteSize];
 };

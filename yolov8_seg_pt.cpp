@@ -27,10 +27,20 @@ constexpr float CONF_PREPROCESS = 0.25f;
 //  Colour palette
 // ============================================================
 
-const cv::Scalar YOLOv8Seg::kPalette[kPaletteSize] = {
+/*const cv::Scalar YOLOv8Seg::kPalette[kPaletteSize] = {
     {255,  128,  256}
-};
+};*/
 
+cv::Scalar categoryColor(int index, int total)
+{
+    float hue = (index * 180.0f / std::max(total, 1)); // HSV hue: 0-180 in OpenCV
+    cv::Mat hsv(1, 1, CV_8UC3, cv::Scalar(hue, 255, 255));
+    cv::Mat bgr;
+    cv::cvtColor(hsv, bgr, cv::COLOR_HSV2BGR);
+    return cv::Scalar(bgr.at<cv::Vec3b>(0, 0)[0],
+        bgr.at<cv::Vec3b>(0, 0)[1],
+        bgr.at<cv::Vec3b>(0, 0)[2]);
+}
 
 static Ort::SessionOptions make_session_opts()
 {
@@ -153,7 +163,7 @@ std::vector<SegDetection> YOLOv8Seg::delete_duplicates(const std::vector<SegDete
 std::vector<Tile> YOLOv8Seg::tiling(const cv::Mat& image, int size=640, int step=320)const
 {   
     std::vector<Tile> tiles;
-    if (image.rows==size && image.cols==size){
+    if (image.rows<=size && image.cols<=size){
         tiles.push_back({image.clone(), 0, 0, size, size});
         std::cout << "return the tile early, the size passes\n";
         return tiles;
@@ -319,7 +329,7 @@ std::vector<SegDetection> YOLOv8Seg::detect(
     final_detections.reserve(keep.size());
     std::cout << "detections before nms" << keep.size() << "\n";
     for (int i : keep) {
-        if (all_detections[i].confidence >= CONF_POSTPROCESS)   // ← only this loop
+        if (all_detections[i].confidence >= CONF_POSTPROCESS)
             final_detections.push_back(std::move(all_detections[i]));
     }
     
@@ -348,7 +358,7 @@ std::vector<SegDetection> YOLOv8Seg::detect(
 
         SegDetection d = all_detections[best_idx];
 
-        // ★ Use the WBF-fused box instead of the winner's box
+        // wbf fused box
         d.box = cv::Rect(
             static_cast<int>(cl.fused_box.x),
             static_cast<int>(cl.fused_box.y),
@@ -356,8 +366,7 @@ std::vector<SegDetection> YOLOv8Seg::detect(
             static_cast<int>(cl.fused_box.height));
         d.confidence = cl.fused_score;
 
-        // ★ Composite masks from all cluster members
-        //   (union — any pixel positive in any member mask counts)
+        //  composite masks from all cluster members
         if (cl.members.size() > 1) {
             cv::Mat combined = cv::Mat::zeros(d.box.size(), CV_8U);
             for (int idx : cl.members) {
@@ -387,7 +396,7 @@ std::vector<SegDetection> YOLOv8Seg::detect(
 
         final_detections.push_back(std::move(d));
     }
-    final_detections = delete_duplicates(final_detections);
+    //final_detections = delete_duplicates(final_detections);
     return final_detections;
 
 }
@@ -460,6 +469,45 @@ cv::Mat YOLOv8Seg::assembleMask(const float*    proto_data,
     binary.convertTo(binary, CV_8U);
 
     return binary;  // tile-local, placed by draw() using mask_origin
+}
+
+std::vector<std::vector<SegDetection>> YOLOv8Seg::sort_detections(const std::vector<SegDetection>& detections) const
+{   
+    std::vector<std::vector<SegDetection>> categories;
+
+    for (int i = 0; i < (int)detections.size(); ++i) {
+          
+        double w = (double) detections[i].box.width;
+        double h = (double) detections[i].box.height;
+
+        int bestCat = -1;
+
+        for (int j = 0; j < (int)categories.size(); ++j) {
+            //0.1 +- faktor, wenn keine kategorien gefunden, mach neue
+            double cat_h = (double) categories[j][0].box.height;
+            double cat_w = (double)categories[j][0].box.width;
+            if ((h >= 0.8 * cat_h && h <= 1.2 * cat_h) && (w >= 0.8 * cat_w && w <= 1.2 * cat_w)) {            
+                bestCat = j;
+                break; 
+            }
+        }
+        if (bestCat != -1) {
+            categories[bestCat].push_back(detections[i]); // fix: was categories[i], should be categories[bestCat]
+        }
+        else {
+            categories.push_back({ detections[i] });
+            std::cout << "new category\n";
+        }
+    }
+
+    //sort nach größe >
+    std::sort(categories.begin(), categories.end(),
+        [](const std::vector<SegDetection>& a, const std::vector<SegDetection>& b) {
+            return a.size() > b.size();
+        });
+
+    std::cout << categories.size() << "categories were found\n";
+    return categories;
 }
 
 // ============================================================
@@ -552,73 +600,82 @@ cv::Mat YOLOv8Seg::draw(const cv::Mat& image,
     const std::vector<SegDetection>& detections,
     const std::vector<std::string>& class_names,
     float                            alpha) const
-{
+{   
+
+    std::vector<std::vector<SegDetection>> brick_categories = sort_detections(detections);
     cv::Mat out = image.clone();
 
-    for (size_t i = 0; i < detections.size(); ++i) {
-        const auto& d = detections[i];
-        const cv::Scalar& colour = kPalette[i % kPaletteSize];
-        /*
-        // --- mask overlay ---
-        if (!d.mask.empty()) {
-            cv::Rect image_rect(0, 0, out.cols, out.rows);
-            cv::Rect roi_rect = d.box & image_rect;
+    const int num_categories = (int)brick_categories.size();
+    std::vector<cv::Scalar> colors(num_categories);
+    for (int k = 0; k < num_categories; ++k)
+        colors[k] = categoryColor(k, num_categories);
 
-            if (roi_rect.width > 0 && roi_rect.height > 0) {
+    std::cout << "num categories: " << num_categories << "\n";
+    
+    for (size_t j = 0; j < brick_categories.size(); ++j) {
+        const cv::Scalar& colour = colors[j];
+        for (size_t i = 0; i < brick_categories[j].size(); ++i) {
+            const auto& d = brick_categories[j][i];         
+            // --- mask overlay ---
+            if (!d.mask.empty()) {
+                cv::Rect image_rect(0, 0, out.cols, out.rows);
+                cv::Rect roi_rect = d.box & image_rect;
 
-                // 1. Resize mask to ROI if needed
-                cv::Mat actual_mask;
-                if (d.mask.size() != roi_rect.size())
-                    cv::resize(d.mask, actual_mask, roi_rect.size(),
-                        0, 0, cv::INTER_NEAREST);
-                else
-                    actual_mask = d.mask;
+                if (roi_rect.width > 0 && roi_rect.height > 0) {
 
-                // binarize the mask properly (d.mask is already
-                //   uint8 after postprocess, skip this if already binary)
-                cv::Mat binary_mask;
-                if (actual_mask.type() == CV_32F)
-                    binary_mask = actual_mask > 0.75f;   // float soft mask
-                else
-                    binary_mask = actual_mask > 127;    // uint8 mask
+                    // 1. Resize mask to ROI if needed
+                    cv::Mat actual_mask;
+                    if (d.mask.size() != roi_rect.size())
+                        cv::resize(d.mask, actual_mask, roi_rect.size(),
+                            0, 0, cv::INTER_NEAREST);
+                    else
+                        actual_mask = d.mask;
 
-                // fill ratio guard, correct variable names
-                double mask_area = cv::countNonZero(binary_mask);
-                double box_area = static_cast<double>(roi_rect.width)
-                    * static_cast<double>(roi_rect.height);
-                if (box_area > 0 && (mask_area / box_area) < 0.05)
-                    continue;   // mask is nearly empty — skip this detection
+                    // binarize the mask properly (d.mask is already
+                    //   uint8 after postprocess, skip this if already binary)
+                    cv::Mat binary_mask;
+                    if (actual_mask.type() == CV_32F)
+                        binary_mask = actual_mask > 0.75f;   // float soft mask
+                    else
+                        binary_mask = actual_mask > 127;    // uint8 mask
 
-                // 2. Blend coloured overlay where mask is active
-                cv::Mat roi_img = out(roi_rect);
-                cv::Mat color_roi(roi_rect.size(), CV_8UC3, colour);
+                    // fill ratio guard, correct variable names
+                    double mask_area = cv::countNonZero(binary_mask);
+                    double box_area = static_cast<double>(roi_rect.width)
+                        * static_cast<double>(roi_rect.height);
+                    if (box_area > 0 && (mask_area / box_area) < 0.05)
+                        continue;   // mask is nearly empty — skip this detection
 
-                cv::Mat masked_overlay = cv::Mat::zeros(roi_rect.size(), CV_8UC3);
-                color_roi.copyTo(masked_overlay, binary_mask);
-                cv::addWeighted(roi_img, 1.0, masked_overlay, alpha, 0.0, roi_img);
+                    // 2. Blend coloured overlay where mask is active
+                    cv::Mat roi_img = out(roi_rect);
+                    cv::Mat color_roi(roi_rect.size(), CV_8UC3, colour);
+
+                    cv::Mat masked_overlay = cv::Mat::zeros(roi_rect.size(), CV_8UC3);
+                    color_roi.copyTo(masked_overlay, binary_mask);
+                    cv::addWeighted(roi_img, 1.0, masked_overlay, alpha, 0.0, roi_img);
+                }
             }
+
+            // --- bounding box ---
+            cv::rectangle(out, d.box, colour, 2);
+            /*
+            // --- label ---
+            std::string label = class_names.empty()
+                ? "cls" + std::to_string(d.class_id)
+                : class_names[d.class_id];
+            label += " " + std::to_string(static_cast<int>(d.confidence * 100)) + "%";
+
+            int baseline = 0;
+            auto tsz = cv::getTextSize(label, cv::FONT_HERSHEY_SIMPLEX, 0.6, 1, &baseline);
+            cv::Point tl{d.box.x, std::max(d.box.y - tsz.height - 4, 0)};
+            cv::rectangle(out, tl,
+                           {tl.x + tsz.width, tl.y + tsz.height + baseline + 4},
+                           colour, cv::FILLED);
+            cv::putText(out, label, {d.box.x, tl.y + tsz.height},
+                        cv::FONT_HERSHEY_SIMPLEX, 0.6,
+                        cv::Scalar(0, 0, 0), 1, cv::LINE_AA);*/
         }
-        */
-        // --- bounding box ---
-        cv::rectangle(out, d.box, colour, 2);
-        /*
-        // --- label ---
-        std::string label = class_names.empty()
-            ? "cls" + std::to_string(d.class_id)
-            : class_names[d.class_id];
-        label += " " + std::to_string(static_cast<int>(d.confidence * 100)) + "%";
-
-        int baseline = 0;
-        auto tsz = cv::getTextSize(label, cv::FONT_HERSHEY_SIMPLEX, 0.6, 1, &baseline);
-        cv::Point tl{d.box.x, std::max(d.box.y - tsz.height - 4, 0)};
-        cv::rectangle(out, tl,
-                       {tl.x + tsz.width, tl.y + tsz.height + baseline + 4},
-                       colour, cv::FILLED);
-        cv::putText(out, label, {d.box.x, tl.y + tsz.height},
-                    cv::FONT_HERSHEY_SIMPLEX, 0.6,
-                    cv::Scalar(0, 0, 0), 1, cv::LINE_AA);*/
     }
-
     return out;
 }
 
@@ -743,3 +800,5 @@ std::vector<WBFCluster> YOLOv8Seg::wbf(
 
     return result;
 }
+
+
