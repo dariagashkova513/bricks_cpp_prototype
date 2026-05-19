@@ -330,8 +330,11 @@ std::vector<SegDetection> YOLOv8Seg::detect(
     }
 
     final_detections = delete_duplicates(final_detections);
-    return final_detections;
 
+    //call avg colors
+    std::vector<int> colors = sort_by_color(image, final_detections, 400.0);
+    std::cout << "amount of color groups found: " << colors.size() << "\n";
+    return final_detections;
 }
 
 // ============================================================
@@ -736,3 +739,84 @@ std::vector<WBFCluster> YOLOv8Seg::wbf(
 }
 
 
+constexpr double kMaxLabDistance = 294.0;
+
+cv::Scalar getAverageColor(const cv::Mat& image, const SegDetection& det)
+{
+    // Crop image to bounding box — no need to scan the whole image
+    cv::Mat roiImage = image(det.box);
+
+    // The mask covers only the bounding box area, so crop it too
+    cv::Rect maskRect(det.mask_origin, det.box.size());
+    cv::Mat  roiMask = det.mask(maskRect);
+
+    return cv::mean(roiImage, roiMask); // Scalar(B, G, R, 0)
+}
+
+cv::Scalar bgrToLab(const cv::Scalar& bgr)
+{
+    cv::Mat pixel(1, 1, CV_8UC3, cv::Scalar(
+        cv::saturate_cast<uchar>(bgr[0]),  // B
+        cv::saturate_cast<uchar>(bgr[1]),  // G
+        cv::saturate_cast<uchar>(bgr[2])   // R
+    ));
+    cv::cvtColor(pixel, pixel, cv::COLOR_BGR2Lab);
+    auto p = pixel.at<cv::Vec3b>(0, 0);
+    return cv::Scalar(p[0], p[1], p[2]);
+}
+
+
+//TODO: fix ´sorting algorithm
+std::vector<int> YOLOv8Seg::sort_by_color(const cv::Mat& image,
+    const std::vector<SegDetection>& detections, double percent) const
+{
+    // --- get average BGR colors ---
+    std::vector<cv::Scalar> bgrColors;
+    bgrColors.reserve(detections.size());
+    for (const auto& det : detections)
+        bgrColors.push_back(getAverageColor(image, det));
+
+    // --- convert to Lab ---
+    std::vector<cv::Scalar> labColors;
+    labColors.reserve(bgrColors.size());
+    for (const auto& bgr : bgrColors)
+        labColors.push_back(bgrToLab(bgr));
+
+    const double threshold = (percent / 100.0) * kMaxLabDistance;
+
+    std::vector<int> groups(labColors.size(), -1);
+    int nextGroup = 0;
+
+    for (int i = 0; i < (int)labColors.size(); i++)
+    {
+        if (groups[i] != -1) continue;
+
+        groups[i] = nextGroup;
+
+        for (int j = i + 1; j < (int)labColors.size(); j++)
+        {
+            if (groups[j] != -1) continue;
+
+            // Compare against ALL members already in this group
+            bool matched = false;
+            for (int k = 0; k <= i; k++)
+            {
+                if (groups[k] != nextGroup) continue;
+
+                double dL = labColors[k][0] - labColors[j][0];
+                double da = labColors[k][1] - labColors[j][1];
+                double db = labColors[k][2] - labColors[j][2];
+
+                if (std::sqrt(dL * dL + da * da + db * db) < threshold)
+                {
+                    matched = true;
+                    break;
+                }
+            }
+            if (matched)
+                groups[j] = nextGroup;
+        }
+        nextGroup++;
+    }
+    return groups;
+}
