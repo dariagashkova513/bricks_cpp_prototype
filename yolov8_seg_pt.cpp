@@ -7,30 +7,25 @@
 #include <stdexcept>
 #include <filesystem>
 
-//=============================================================
-// TODO
-// 1 tiling Algorithmus : BEARBEITEN
-    /**  1. Use step = 320 (50 % overlap)
-    2. Predict on all tiles normally
-    3. Convert all masks to global coordinates
-    4. Use WBF to merge boxes → get cluster membership per instance
-    5. For each WBF cluster : union or weighted - blend all contributing masks
-    6. Final threshold the blended mask*/
-// 2 1 großes Bild mit Tile ersetzen /
-// 3 test auf geri nord jetzt / 
-// 4 erneut trainierte model einsetzen /
-// 5 mehrere tests
-//=============================================================
-
 constexpr float CONF_PREPROCESS = 0.25f;
 // ============================================================
 //  Colour palette
 // ============================================================
 
-const cv::Scalar YOLOv8Seg::kPalette[kPaletteSize] = {
+/*const cv::Scalar YOLOv8Seg::kPalette[kPaletteSize] = {
     {255,  128,  256}
-};
+};*/
 
+cv::Scalar categoryColor(int index, int total)
+{
+    float hue = (index * 180.0f / std::max(total, 1)); // HSV hue: 0-180 in OpenCV
+    cv::Mat hsv(1, 1, CV_8UC3, cv::Scalar(hue, 255, 255));
+    cv::Mat bgr;
+    cv::cvtColor(hsv, bgr, cv::COLOR_HSV2BGR);
+    return cv::Scalar(bgr.at<cv::Vec3b>(0, 0)[0],
+        bgr.at<cv::Vec3b>(0, 0)[1],
+        bgr.at<cv::Vec3b>(0, 0)[2]);
+}
 
 static Ort::SessionOptions make_session_opts()
 {
@@ -153,7 +148,7 @@ std::vector<SegDetection> YOLOv8Seg::delete_duplicates(const std::vector<SegDete
 std::vector<Tile> YOLOv8Seg::tiling(const cv::Mat& image, int size=640, int step=320)const
 {   
     std::vector<Tile> tiles;
-    if (image.rows==size && image.cols==size){
+    if (image.rows<=size && image.cols<=size){
         tiles.push_back({image.clone(), 0, 0, size, size});
         std::cout << "return the tile early, the size passes\n";
         return tiles;
@@ -219,9 +214,9 @@ std::vector<SegDetection> YOLOv8Seg::detect(
 )
 {
     if (image.empty())
-        throw std::runtime_error("YOLOv8Seg::detect — empty image");
+        throw std::runtime_error("MLSeg::detect — empty image");
 
- 
+
 
     const int orig_w = image.cols;
     const int orig_h = image.rows;
@@ -229,10 +224,11 @@ std::vector<SegDetection> YOLOv8Seg::detect(
     const auto tiles = tiling(image);
     std::vector<SegDetection> all_detections;
 
-    for (const auto& tile : tiles) {
-        std::cout << "[Inference] Processing tile at (" << tile.origin_x
-            << ", " << tile.origin_y << ") size: " << tile.valid_w
-            << "x" << tile.valid_h << "..." << std::endl;
+    for (const auto& tile : tiles)
+    {
+        /* std::cout << "[Inference] Processing tile at (" << tile.origin_x
+             << ", " << tile.origin_y << ") size: " << tile.valid_w
+             << "x" << tile.valid_h << "..." << std::endl;*/
 
 
         float scale = 0.f;
@@ -286,10 +282,20 @@ std::vector<SegDetection> YOLOv8Seg::detect(
             dets.end());
 
         // --- remove boxes closest to tile borders if border != 0
-
+        constexpr int SEAM_MARGIN = 5;
+        dets.erase(std::remove_if(dets.begin(), dets.end(),
+            [&](const SegDetection& d) {
+                bool touches_left = tile.origin_x > 0 && d.box.x < SEAM_MARGIN;
+                bool touches_top = tile.origin_y > 0 && d.box.y < SEAM_MARGIN;
+                bool touches_right = tile.valid_w == 640 && d.box.x + d.box.width > tile.valid_w - SEAM_MARGIN;
+                bool touches_bottom = tile.valid_h == 640 && d.box.y + d.box.height > tile.valid_h - SEAM_MARGIN;
+                return touches_left || touches_top || touches_right || touches_bottom;
+            }),
+            dets.end());
 
         // --- remap boxes to global coords, store mask origin ---
-        for (auto& det : dets) {
+        for (auto& det : dets)
+        {
             det.box.x += tile.origin_x;
             det.box.y += tile.origin_y;
             det.mask_origin = { tile.origin_x, tile.origin_y };
@@ -301,92 +307,28 @@ std::vector<SegDetection> YOLOv8Seg::detect(
     }
 
     // --- second NMS pass to remove cross-tile duplicates ---
-    std::cout << "started second NMS round ... \n";
     std::vector<cv::Rect> all_boxes;
     std::vector<float>    all_scores;
     all_boxes.reserve(all_detections.size());
     all_scores.reserve(all_detections.size());
 
-    for (const auto& d : all_detections) {
+    for (const auto& d : all_detections)
+    {
         all_boxes.push_back(d.box);
         all_scores.push_back(d.confidence);
     }
 
-    /*std::vector<int> keep;
+    std::vector<int> keep;
     cv::dnn::NMSBoxes(all_boxes, all_scores, conf_thresh_, iou_thresh_, keep);
 
     std::vector<SegDetection> final_detections;
     final_detections.reserve(keep.size());
-    std::cout << "detections before nms" << keep.size() << "\n";
+
     for (int i : keep) {
-        if (all_detections[i].confidence >= CONF_POSTPROCESS)   // ← only this loop
+        if (all_detections[i].confidence >= CONF_POSTPROCESS)
             final_detections.push_back(std::move(all_detections[i]));
     }
-    
-    std::cout << "finished second NMS round \n"
-        << final_detections.size() << " detections\n";*/
-        // ── Replace cv::dnn::NMSBoxes with WBF ───────────────────────
-    auto clusters = wbf(all_detections, orig_w, orig_h,
-        iou_thresh_,   // cluster IoU threshold
-        0.01f);        // skip threshold
 
-    std::vector<SegDetection> final_detections;
-    final_detections.reserve(clusters.size());
-
-    for (const auto& cl : clusters) {
-        if (cl.fused_score < CONF_POSTPROCESS) continue;
-
-        // Pick highest-confidence member as the base detection
-        int best_idx = cl.members[0];
-        float best_conf = 0.f;
-        for (int idx : cl.members) {
-            if (all_detections[idx].confidence > best_conf) {
-                best_conf = all_detections[idx].confidence;
-                best_idx = idx;
-            }
-        }
-
-        SegDetection d = all_detections[best_idx];
-
-        // ★ Use the WBF-fused box instead of the winner's box
-        d.box = cv::Rect(
-            static_cast<int>(cl.fused_box.x),
-            static_cast<int>(cl.fused_box.y),
-            static_cast<int>(cl.fused_box.width),
-            static_cast<int>(cl.fused_box.height));
-        d.confidence = cl.fused_score;
-
-        // ★ Composite masks from all cluster members
-        //   (union — any pixel positive in any member mask counts)
-        if (cl.members.size() > 1) {
-            cv::Mat combined = cv::Mat::zeros(d.box.size(), CV_8U);
-            for (int idx : cl.members) {
-                const auto& md = all_detections[idx];
-                if (md.mask.empty()) continue;
-                // Place member mask into fused box space
-                cv::Rect member_roi = md.box & d.box;
-                if (member_roi.width <= 0 || member_roi.height <= 0) continue;
-                cv::Rect local_roi(
-                    member_roi.x - d.box.x,
-                    member_roi.y - d.box.y,
-                    member_roi.width,
-                    member_roi.height);
-                cv::Rect src_roi(
-                    member_roi.x - md.box.x,
-                    member_roi.y - md.box.y,
-                    member_roi.width,
-                    member_roi.height);
-                if (src_roi.width > md.mask.cols) src_roi.width = md.mask.cols;
-                if (src_roi.height > md.mask.rows) src_roi.height = md.mask.rows;
-                cv::Mat src_patch = md.mask(src_roi);
-                cv::Mat dst_patch = combined(local_roi);
-                cv::bitwise_or(dst_patch, src_patch, dst_patch);
-            }
-            d.mask = combined;
-        }
-
-        final_detections.push_back(std::move(d));
-    }
     final_detections = delete_duplicates(final_detections);
     return final_detections;
 
@@ -460,6 +402,46 @@ cv::Mat YOLOv8Seg::assembleMask(const float*    proto_data,
     binary.convertTo(binary, CV_8U);
 
     return binary;  // tile-local, placed by draw() using mask_origin
+}
+
+std::vector<std::vector<SegDetection>> YOLOv8Seg::sort_detections(const std::vector<SegDetection>& detections) const
+{   
+    std::vector<std::vector<SegDetection>> categories;
+
+    for (int i = 0; i < (int)detections.size(); ++i) {
+          
+        double w = (double) detections[i].box.width;
+        double h = (double) detections[i].box.height;
+
+        int bestCat = -1;
+
+        for (int j = 0; j < (int)categories.size(); ++j) {
+            //0.1 +- faktor, wenn keine kategorien gefunden, mach neue
+            double cat_h = (double) categories[j][0].box.height;
+            double cat_w = (double)categories[j][0].box.width;
+            if (cat_h > cat_w) std::swap(cat_h, cat_w);
+            if ((h >= 0.8 * cat_h && h <= 1.2 * cat_h) && (w >= 0.8 * cat_w && w <= 1.2 * cat_w)) {            
+                bestCat = j;
+                break; 
+            }
+        }
+        if (bestCat != -1) {
+            categories[bestCat].push_back(detections[i]); // fix: was categories[i], should be categories[bestCat]
+        }
+        else {
+            categories.push_back({ detections[i] });
+            std::cout << "new category\n";
+        }
+    }
+
+    //sort nach größe >
+    std::sort(categories.begin(), categories.end(),
+        [](const std::vector<SegDetection>& a, const std::vector<SegDetection>& b) {
+            return a.size() > b.size();
+        });
+
+    std::cout << categories.size() << "categories were found\n";
+    return categories;
 }
 
 // ============================================================
@@ -552,73 +534,82 @@ cv::Mat YOLOv8Seg::draw(const cv::Mat& image,
     const std::vector<SegDetection>& detections,
     const std::vector<std::string>& class_names,
     float                            alpha) const
-{
+{   
+
+    std::vector<std::vector<SegDetection>> brick_categories = sort_detections(detections);
     cv::Mat out = image.clone();
 
-    for (size_t i = 0; i < detections.size(); ++i) {
-        const auto& d = detections[i];
-        const cv::Scalar& colour = kPalette[i % kPaletteSize];
-        /*
-        // --- mask overlay ---
-        if (!d.mask.empty()) {
-            cv::Rect image_rect(0, 0, out.cols, out.rows);
-            cv::Rect roi_rect = d.box & image_rect;
+    const int num_categories = (int)brick_categories.size();
+    std::vector<cv::Scalar> colors(num_categories);
+    for (int k = 0; k < num_categories; ++k)
+        colors[k] = categoryColor(k, num_categories);
 
-            if (roi_rect.width > 0 && roi_rect.height > 0) {
+    std::cout << "num categories: " << num_categories << "\n";
+    
+    for (size_t j = 0; j < brick_categories.size(); ++j) {
+        const cv::Scalar& colour = colors[j];
+        for (size_t i = 0; i < brick_categories[j].size(); ++i) {
+            const auto& d = brick_categories[j][i];         
+            // --- mask overlay ---
+            if (!d.mask.empty()) {
+                cv::Rect image_rect(0, 0, out.cols, out.rows);
+                cv::Rect roi_rect = d.box & image_rect;
 
-                // 1. Resize mask to ROI if needed
-                cv::Mat actual_mask;
-                if (d.mask.size() != roi_rect.size())
-                    cv::resize(d.mask, actual_mask, roi_rect.size(),
-                        0, 0, cv::INTER_NEAREST);
-                else
-                    actual_mask = d.mask;
+                if (roi_rect.width > 0 && roi_rect.height > 0) {
 
-                // binarize the mask properly (d.mask is already
-                //   uint8 after postprocess, skip this if already binary)
-                cv::Mat binary_mask;
-                if (actual_mask.type() == CV_32F)
-                    binary_mask = actual_mask > 0.75f;   // float soft mask
-                else
-                    binary_mask = actual_mask > 127;    // uint8 mask
+                    // 1. Resize mask to ROI if needed
+                    cv::Mat actual_mask;
+                    if (d.mask.size() != roi_rect.size())
+                        cv::resize(d.mask, actual_mask, roi_rect.size(),
+                            0, 0, cv::INTER_NEAREST);
+                    else
+                        actual_mask = d.mask;
 
-                // fill ratio guard, correct variable names
-                double mask_area = cv::countNonZero(binary_mask);
-                double box_area = static_cast<double>(roi_rect.width)
-                    * static_cast<double>(roi_rect.height);
-                if (box_area > 0 && (mask_area / box_area) < 0.05)
-                    continue;   // mask is nearly empty — skip this detection
+                    // binarize the mask properly (d.mask is already
+                    //   uint8 after postprocess, skip this if already binary)
+                    cv::Mat binary_mask;
+                    if (actual_mask.type() == CV_32F)
+                        binary_mask = actual_mask > 0.75f;   // float soft mask
+                    else
+                        binary_mask = actual_mask > 127;    // uint8 mask
 
-                // 2. Blend coloured overlay where mask is active
-                cv::Mat roi_img = out(roi_rect);
-                cv::Mat color_roi(roi_rect.size(), CV_8UC3, colour);
+                    // fill ratio guard, correct variable names
+                    double mask_area = cv::countNonZero(binary_mask);
+                    double box_area = static_cast<double>(roi_rect.width)
+                        * static_cast<double>(roi_rect.height);
+                    if (box_area > 0 && (mask_area / box_area) < 0.05)
+                        continue;   // mask is nearly empty — skip this detection
 
-                cv::Mat masked_overlay = cv::Mat::zeros(roi_rect.size(), CV_8UC3);
-                color_roi.copyTo(masked_overlay, binary_mask);
-                cv::addWeighted(roi_img, 1.0, masked_overlay, alpha, 0.0, roi_img);
+                    // 2. Blend coloured overlay where mask is active
+                    cv::Mat roi_img = out(roi_rect);
+                    cv::Mat color_roi(roi_rect.size(), CV_8UC3, colour);
+
+                    cv::Mat masked_overlay = cv::Mat::zeros(roi_rect.size(), CV_8UC3);
+                    color_roi.copyTo(masked_overlay, binary_mask);
+                    cv::addWeighted(roi_img, 1.0, masked_overlay, alpha, 0.0, roi_img);
+                }
             }
+
+            // --- bounding box ---
+            cv::rectangle(out, d.box, colour, 2);
+            /*
+            // --- label ---
+            std::string label = class_names.empty()
+                ? "cls" + std::to_string(d.class_id)
+                : class_names[d.class_id];
+            label += " " + std::to_string(static_cast<int>(d.confidence * 100)) + "%";
+
+            int baseline = 0;
+            auto tsz = cv::getTextSize(label, cv::FONT_HERSHEY_SIMPLEX, 0.6, 1, &baseline);
+            cv::Point tl{d.box.x, std::max(d.box.y - tsz.height - 4, 0)};
+            cv::rectangle(out, tl,
+                           {tl.x + tsz.width, tl.y + tsz.height + baseline + 4},
+                           colour, cv::FILLED);
+            cv::putText(out, label, {d.box.x, tl.y + tsz.height},
+                        cv::FONT_HERSHEY_SIMPLEX, 0.6,
+                        cv::Scalar(0, 0, 0), 1, cv::LINE_AA);*/
         }
-        */
-        // --- bounding box ---
-        cv::rectangle(out, d.box, colour, 2);
-        /*
-        // --- label ---
-        std::string label = class_names.empty()
-            ? "cls" + std::to_string(d.class_id)
-            : class_names[d.class_id];
-        label += " " + std::to_string(static_cast<int>(d.confidence * 100)) + "%";
-
-        int baseline = 0;
-        auto tsz = cv::getTextSize(label, cv::FONT_HERSHEY_SIMPLEX, 0.6, 1, &baseline);
-        cv::Point tl{d.box.x, std::max(d.box.y - tsz.height - 4, 0)};
-        cv::rectangle(out, tl,
-                       {tl.x + tsz.width, tl.y + tsz.height + baseline + 4},
-                       colour, cv::FILLED);
-        cv::putText(out, label, {d.box.x, tl.y + tsz.height},
-                    cv::FONT_HERSHEY_SIMPLEX, 0.6,
-                    cv::Scalar(0, 0, 0), 1, cv::LINE_AA);*/
     }
-
     return out;
 }
 
@@ -743,3 +734,5 @@ std::vector<WBFCluster> YOLOv8Seg::wbf(
 
     return result;
 }
+
+
