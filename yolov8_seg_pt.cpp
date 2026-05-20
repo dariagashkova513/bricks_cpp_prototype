@@ -331,9 +331,7 @@ std::vector<SegDetection> YOLOv8Seg::detect(
 
     final_detections = delete_duplicates(final_detections);
 
-    //call avg colors
-    std::vector<int> colors = sort_by_color(image, final_detections, 400.0);
-    std::cout << "amount of color groups found: " << colors.size() << "\n";
+    std::cout << "detections: " << final_detections.size() << "\n";
     return final_detections;
 }
 
@@ -407,7 +405,7 @@ cv::Mat YOLOv8Seg::assembleMask(const float*    proto_data,
     return binary;  // tile-local, placed by draw() using mask_origin
 }
 
-std::vector<std::vector<SegDetection>> YOLOv8Seg::sort_detections(const std::vector<SegDetection>& detections) const
+std::vector<std::vector<SegDetection>> YOLOv8Seg::sort_by_size(const std::vector<SegDetection>& detections) const
 {   
     std::vector<std::vector<SegDetection>> categories;
 
@@ -433,7 +431,7 @@ std::vector<std::vector<SegDetection>> YOLOv8Seg::sort_detections(const std::vec
         }
         else {
             categories.push_back({ detections[i] });
-            std::cout << "new category\n";
+            //std::cout << "new category\n";
         }
     }
 
@@ -539,7 +537,7 @@ cv::Mat YOLOv8Seg::draw(const cv::Mat& image,
     float                            alpha) const
 {   
 
-    std::vector<std::vector<SegDetection>> brick_categories = sort_detections(detections);
+    std::vector<std::vector<SegDetection>> brick_categories = sort_by_color(image, detections, 10.0);
     cv::Mat out = image.clone();
 
     const int num_categories = (int)brick_categories.size();
@@ -552,7 +550,8 @@ cv::Mat YOLOv8Seg::draw(const cv::Mat& image,
     for (size_t j = 0; j < brick_categories.size(); ++j) {
         const cv::Scalar& colour = colors[j];
         for (size_t i = 0; i < brick_categories[j].size(); ++i) {
-            const auto& d = brick_categories[j][i];         
+            const auto& d = brick_categories[j][i];     
+            /*
             // --- mask overlay ---
             if (!d.mask.empty()) {
                 cv::Rect image_rect(0, 0, out.cols, out.rows);
@@ -592,7 +591,7 @@ cv::Mat YOLOv8Seg::draw(const cv::Mat& image,
                     cv::addWeighted(roi_img, 1.0, masked_overlay, alpha, 0.0, roi_img);
                 }
             }
-
+            */
             // --- bounding box ---
             cv::rectangle(out, d.box, colour, 2);
             /*
@@ -739,84 +738,99 @@ std::vector<WBFCluster> YOLOv8Seg::wbf(
 }
 
 
-constexpr double kMaxLabDistance = 294.0;
+
+const double kMaxHsvDistance = std::sqrt(180.0 * 180.0 + 255.0 * 255.0 + 255.0 * 255.0);
 
 cv::Scalar getAverageColor(const cv::Mat& image, const SegDetection& det)
 {
-    // Crop image to bounding box — no need to scan the whole image
-    cv::Mat roiImage = image(det.box);
+    // Clamp bounding box to image bounds
+    cv::Rect safeBox = det.box & cv::Rect(0, 0, image.cols, image.rows);
+    if (safeBox.empty())
+        return cv::Scalar(0, 0, 0, 0);
 
-    // The mask covers only the bounding box area, so crop it too
-    cv::Rect maskRect(det.mask_origin, det.box.size());
-    cv::Mat  roiMask = det.mask(maskRect);
+    cv::Mat roiImage = image(safeBox);
 
-    return cv::mean(roiImage, roiMask); // Scalar(B, G, R, 0)
+    // Clamp maskRect to mask bounds
+    cv::Rect maskRect(det.mask_origin, safeBox.size());
+    cv::Rect safeMaskRect = maskRect & cv::Rect(0, 0, det.mask.cols, det.mask.rows);
+    if (safeMaskRect.empty())
+        return cv::Scalar(0, 0, 0, 0);
+
+    cv::Mat roiMask = det.mask(safeMaskRect);
+
+    // If clamping caused a size mismatch, resize mask to match roi
+    if (roiMask.size() != roiImage.size())
+        cv::resize(roiMask, roiMask, roiImage.size(), 0, 0, cv::INTER_NEAREST);
+
+    return cv::mean(roiImage, roiMask);
 }
 
-cv::Scalar bgrToLab(const cv::Scalar& bgr)
-{
-    cv::Mat pixel(1, 1, CV_8UC3, cv::Scalar(
-        cv::saturate_cast<uchar>(bgr[0]),  // B
-        cv::saturate_cast<uchar>(bgr[1]),  // G
-        cv::saturate_cast<uchar>(bgr[2])   // R
-    ));
-    cv::cvtColor(pixel, pixel, cv::COLOR_BGR2Lab);
-    auto p = pixel.at<cv::Vec3b>(0, 0);
-    return cv::Scalar(p[0], p[1], p[2]);
-}
-
-
-//TODO: fix ´sorting algorithm
-std::vector<int> YOLOv8Seg::sort_by_color(const cv::Mat& image,
+std::vector<std::vector<SegDetection>> YOLOv8Seg::sort_by_color(const cv::Mat& image,
     const std::vector<SegDetection>& detections, double percent) const
 {
-    // --- get average BGR colors ---
-    std::vector<cv::Scalar> bgrColors;
-    bgrColors.reserve(detections.size());
+    if (detections.empty())
+        return {};
+
+    // Convert full image to HSV once
+    cv::Mat hsvImage;
+    cv::cvtColor(image, hsvImage, cv::COLOR_BGR2HSV);
+
+    // Compute average HSV color per detection (with safe ROI clamping)
+    std::vector<cv::Scalar> hsvColors;
+    hsvColors.reserve(detections.size());
     for (const auto& det : detections)
-        bgrColors.push_back(getAverageColor(image, det));
+        hsvColors.push_back(getAverageColor(hsvImage, det));
 
-    // --- convert to Lab ---
-    std::vector<cv::Scalar> labColors;
-    labColors.reserve(bgrColors.size());
-    for (const auto& bgr : bgrColors)
-        labColors.push_back(bgrToLab(bgr));
+    // Distance in HSV space with hue wraparound
+    auto colorDistance = [](const cv::Scalar& a, const cv::Scalar& b) {
+        double dh = std::abs(a[0] - b[0]);
+        dh = std::min(dh, 180.0 - dh);          // hue wraps at 180 in OpenCV
+        double ds = a[1] - b[1];
+        double dv = a[2] - b[2];
+        return std::sqrt(dh * dh + ds * ds + dv * dv);
+    };
 
-    const double threshold = (percent / 100.0) * kMaxLabDistance;
+    // Map percent onto the maximum possible HSV distance
+    const double kMaxHsvDistance = std::sqrt(90.0 * 90.0 + 255.0 * 255.0 + 255.0 * 255.0);
+    const double threshold = (percent / 100.0) * kMaxHsvDistance;
 
-    std::vector<int> groups(labColors.size(), -1);
-    int nextGroup = 0;
+    std::cout << "threshold: " << threshold << "  maxDist: " << kMaxHsvDistance << "\n";
 
-    for (int i = 0; i < (int)labColors.size(); i++)
+    // Each category is represented by the index of its first detection
+    std::vector<int>                       representatives;
+    std::vector<std::vector<SegDetection>> categories;
+
+    for (int i = 0; i < static_cast<int>(detections.size()); ++i)
     {
-        if (groups[i] != -1) continue;
+        int    bestCat = -1;
+        double bestDist = std::numeric_limits<double>::max();
 
-        groups[i] = nextGroup;
-
-        for (int j = i + 1; j < (int)labColors.size(); j++)
+        for (int j = 0; j < static_cast<int>(categories.size()); ++j)
         {
-            if (groups[j] != -1) continue;
+            double dist = colorDistance(hsvColors[i], hsvColors[representatives[j]]);
+            std::cout << "  det[" << i << "] vs cat[" << j << "]  dist=" << dist << "\n";
 
-            // Compare against ALL members already in this group
-            bool matched = false;
-            for (int k = 0; k <= i; k++)
+            if (dist < threshold && dist < bestDist)
             {
-                if (groups[k] != nextGroup) continue;
-
-                double dL = labColors[k][0] - labColors[j][0];
-                double da = labColors[k][1] - labColors[j][1];
-                double db = labColors[k][2] - labColors[j][2];
-
-                if (std::sqrt(dL * dL + da * da + db * db) < threshold)
-                {
-                    matched = true;
-                    break;
-                }
+                bestDist = dist;
+                bestCat = j;
             }
-            if (matched)
-                groups[j] = nextGroup;
         }
-        nextGroup++;
+
+        if (bestCat != -1)
+        {
+            categories[bestCat].push_back(detections[i]);
+        }
+        else
+        {
+            std::cout << "new category  det[" << i << "]  HSV=["
+                << hsvColors[i][0] << ", "
+                << hsvColors[i][1] << ", "
+                << hsvColors[i][2] << "]\n";
+            representatives.push_back(i);
+            categories.push_back({ detections[i] });
+        }
     }
-    return groups;
+
+    return categories;
 }

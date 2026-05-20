@@ -92,10 +92,10 @@ private:
     std::vector<SegDetection> delete_duplicates(const std::vector<SegDetection>& detections, const float iou_thresh_ = 0.05f) const;
 
     //statistische sort nach größe
-    std::vector<std::vector<SegDetection>> sort_detections(const std::vector<SegDetection>& detections) const;
+    std::vector<std::vector<SegDetection>> sort_by_size(const std::vector<SegDetection>& detections) const;
     
     //sort nach farben
-    std::vector<int> sort_by_color(const cv::Mat& image, const std::vector<SegDetection>& detections, double percent = 15.0) const;
+    std::vector<std::vector<SegDetection>> sort_by_color(const cv::Mat& image, const std::vector<SegDetection>& detections, double percent) const;
 
     Ort::Env            env_;
     Ort::SessionOptions session_opts_;
