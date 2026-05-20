@@ -790,11 +790,8 @@ std::vector<std::vector<SegDetection>> YOLOv8Seg::sort_by_color(const cv::Mat& i
         return std::sqrt(dh * dh + ds * ds + dv * dv);
     };
 
-    // Map percent onto the maximum possible HSV distance
-    const double kMaxHsvDistance = std::sqrt(90.0 * 90.0 + 255.0 * 255.0 + 255.0 * 255.0);
-    const double threshold = (percent / 100.0) * kMaxHsvDistance;
-
-    std::cout << "threshold: " << threshold << "  maxDist: " << kMaxHsvDistance << "\n";
+ 
+    const double threshold = (percent / 100.0) * 255.0;
 
     // Each category is represented by the index of its first detection
     std::vector<int>                       representatives;
@@ -803,34 +800,34 @@ std::vector<std::vector<SegDetection>> YOLOv8Seg::sort_by_color(const cv::Mat& i
     for (int i = 0; i < static_cast<int>(detections.size()); ++i)
     {
         int    bestCat = -1;
-        double bestDist = std::numeric_limits<double>::max();
+        double bestHueMatch = 255;//;S/V //179.0;H
 
         for (int j = 0; j < static_cast<int>(categories.size()); ++j)
         {
-            double dist = colorDistance(hsvColors[i], hsvColors[representatives[j]]);
+            double dist = std::abs(hsvColors[i][1] - hsvColors[j][1]);
             std::cout << "  det[" << i << "] vs cat[" << j << "]  dist=" << dist << "\n";
 
-            if (dist < threshold && dist < bestDist)
+            if (dist < threshold && dist < bestHueMatch)
             {
-                bestDist = dist;
+                bestHueMatch = dist;
                 bestCat = j;
             }
         }
-
         if (bestCat != -1)
         {
             categories[bestCat].push_back(detections[i]);
         }
         else
         {
-            std::cout << "new category  det[" << i << "]  HSV=["
-                << hsvColors[i][0] << ", "
-                << hsvColors[i][1] << ", "
-                << hsvColors[i][2] << "]\n";
             representatives.push_back(i);
             categories.push_back({ detections[i] });
         }
     }
+
+    /*for (int i = 0; i < static_cast<int>(categories.size()); ++i) {
+    
+    
+    }*/
 
     return categories;
 }
