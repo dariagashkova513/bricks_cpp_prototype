@@ -781,6 +781,8 @@ std::vector<std::vector<SegDetection>> YOLOv8Seg::sort_by_color(const cv::Mat& i
     for (const auto& det : detections)
         hsvColors.push_back(getAverageColor(hsvImage, det));
 
+    std::vector<std::vector<SegDetection>> colorCategories;
+
     // Distance in HSV space with hue wraparound
     auto colorDistance = [](const cv::Scalar& a, const cv::Scalar& b) {
         double dh = std::abs(a[0] - b[0]);
@@ -790,44 +792,82 @@ std::vector<std::vector<SegDetection>> YOLOv8Seg::sort_by_color(const cv::Mat& i
         return std::sqrt(dh * dh + ds * ds + dv * dv);
     };
 
- 
     const double threshold = (percent / 100.0) * 255.0;
+    const double hueThreshold = (percent / 100.0) * 179.0;
 
     // Each category is represented by the index of its first detection
     std::vector<int>                       representatives;
-    std::vector<std::vector<SegDetection>> categories;
+    std::vector<std::vector<SegDetection>> satCategories;
 
     for (int i = 0; i < static_cast<int>(detections.size()); ++i)
     {
         int    bestCat = -1;
-        double bestHueMatch = 255;//;S/V //179.0;H
+        double bestSatMatch = 255.0;//;S/V //179.0;H
 
-        for (int j = 0; j < static_cast<int>(categories.size()); ++j)
+        for (int j = 0; j < static_cast<int>(satCategories.size()); ++j)
         {
             double dist = std::abs(hsvColors[i][1] - hsvColors[j][1]);
             std::cout << "  det[" << i << "] vs cat[" << j << "]  dist=" << dist << "\n";
 
-            if (dist < threshold && dist < bestHueMatch)
+            if (dist < threshold && dist < bestSatMatch)
             {
-                bestHueMatch = dist;
+                bestSatMatch = dist;
                 bestCat = j;
             }
         }
         if (bestCat != -1)
         {
-            categories[bestCat].push_back(detections[i]);
+            satCategories[bestCat].push_back(detections[i]);
         }
         else
         {
             representatives.push_back(i);
-            categories.push_back({ detections[i] });
+            satCategories.push_back({ detections[i] });
         }
     }
 
-    /*for (int i = 0; i < static_cast<int>(categories.size()); ++i) {
-    
-    
-    }*/
+    std::vector<std::vector<std::vector<SegDetection>>> hueCategories;
+    hueCategories.resize(satCategories.size());
 
-    return categories;
+    for (int s = 0; s < satCategories.size(); ++s)
+    {
+        const auto& satGroup = satCategories[s];
+
+        std::vector<int> hueReps;
+
+        for (int i = 0; i < satGroup.size(); ++i)
+        {
+            int bestCat = -1;
+            double bestHueMatch = 179.0;
+
+            for (int j = 0; j < hueReps.size(); ++j)
+            {
+                int repIndex = hueReps[j];
+                double h1 = 0; // hsvColors[satGroup[i]][0];
+                double h2 = 0;// hsvColors[satGroup[repIndex]][0];
+
+                double raw = std::abs(h1 - h2);
+                double dist = std::min(raw, 180.0 - raw); // circular hue distance
+
+                if (dist < hueThreshold && dist < bestHueMatch)
+                {
+                    bestHueMatch = dist;
+                    bestCat = j;
+                }
+            }
+
+            if (bestCat != -1)
+            {
+                hueCategories[s][bestCat].push_back(satGroup[i]);
+            }
+            else
+            {
+                hueReps.push_back(i);
+                hueCategories[s].push_back({ satGroup[i] });
+            }
+        }
+    }
+
+
+    return colorCategories;
 }
