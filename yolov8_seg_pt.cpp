@@ -1,4 +1,5 @@
 #include "include/yolov8_seg_pt.hpp"
+#include "include/color_space_cell.hpp"
 
 #include <algorithm>
 #include <cassert>
@@ -6,6 +7,8 @@
 #include <numeric>
 #include <stdexcept>
 #include <filesystem>
+#include <fstream>
+#include <iostream>
 
 constexpr float CONF_PREPROCESS = 0.25f;
 // ============================================================
@@ -537,7 +540,7 @@ cv::Mat YOLOv8Seg::draw(const cv::Mat& image,
     float                            alpha) const
 {   
 
-    std::vector<std::vector<SegDetection>> brick_categories = sort_by_color(image, detections, 10.0);
+    std::vector<std::vector<SegDetection>> brick_categories = sort_by_color(image, detections, 12.5);
     cv::Mat out = image.clone();
 
     const int num_categories = (int)brick_categories.size();
@@ -781,93 +784,46 @@ std::vector<std::vector<SegDetection>> YOLOv8Seg::sort_by_color(const cv::Mat& i
     for (const auto& det : detections)
         hsvColors.push_back(getAverageColor(hsvImage, det));
 
+    // Write results to a text file
+    std::ofstream outFile("hsv_colors.txt");
+    if (!outFile.is_open())
+    {
+        std::cerr << "Error: Could not open output file." << std::endl;
+    }
+    else
+    {
+        for (size_t i = 0; i < hsvColors.size(); ++i)
+        {
+            const cv::Scalar& c = hsvColors[i];
+            outFile
+                << c[0] << ", "
+                << c[1] << ", "
+                << c[2] << "\n";
+        }
+        outFile.close();
+    }
+
     std::vector<std::vector<SegDetection>> colorCategories;
+    colorCategories.resize(detections.size());
+    DynamicGrid dgrid(percent);
 
-    // Distance in HSV space with hue wraparound
-    auto colorDistance = [](const cv::Scalar& a, const cv::Scalar& b) {
-        double dh = std::abs(a[0] - b[0]);
-        dh = std::min(dh, 180.0 - dh);          // hue wraps at 180 in OpenCV
-        double ds = a[1] - b[1];
-        double dv = a[2] - b[2];
-        return std::sqrt(dh * dh + ds * ds + dv * dv);
-    };
 
-    const double threshold = (percent / 100.0) * 255.0;
-    const double hueThreshold = (percent / 100.0) * 179.0;
+    for (int i = 0; i < detections.size(); i++) {
+        std::array<double, 3>point = { hsvColors[i][0], hsvColors[i][1], hsvColors[i][2] };
+        auto& colSubSpace = dgrid.getDCSS(point);
+        int id = colSubSpace.id;
+        
+        if (id >= colorCategories.size())
+            colorCategories.resize(id + 1);
 
-    // Each category is represented by the index of its first detection
-    std::vector<int>                       representatives;
-    std::vector<std::vector<SegDetection>> satCategories;
-
-    for (int i = 0; i < static_cast<int>(detections.size()); ++i)
-    {
-        int    bestCat = -1;
-        double bestSatMatch = 255.0;//;S/V //179.0;H
-
-        for (int j = 0; j < static_cast<int>(satCategories.size()); ++j)
-        {
-            double dist = std::abs(hsvColors[i][1] - hsvColors[j][1]);
-            std::cout << "  det[" << i << "] vs cat[" << j << "]  dist=" << dist << "\n";
-
-            if (dist < threshold && dist < bestSatMatch)
-            {
-                bestSatMatch = dist;
-                bestCat = j;
-            }
-        }
-        if (bestCat != -1)
-        {
-            satCategories[bestCat].push_back(detections[i]);
-        }
-        else
-        {
-            representatives.push_back(i);
-            satCategories.push_back({ detections[i] });
-        }
+        colorCategories[id].push_back(detections[i]);
     }
 
-    std::vector<std::vector<std::vector<SegDetection>>> hueCategories;
-    hueCategories.resize(satCategories.size());
-
-    for (int s = 0; s < satCategories.size(); ++s)
-    {
-        const auto& satGroup = satCategories[s];
-
-        std::vector<int> hueReps;
-
-        for (int i = 0; i < satGroup.size(); ++i)
-        {
-            int bestCat = -1;
-            double bestHueMatch = 179.0;
-
-            for (int j = 0; j < hueReps.size(); ++j)
-            {
-                int repIndex = hueReps[j];
-                double h1 = 0; // hsvColors[satGroup[i]][0];
-                double h2 = 0;// hsvColors[satGroup[repIndex]][0];
-
-                double raw = std::abs(h1 - h2);
-                double dist = std::min(raw, 180.0 - raw); // circular hue distance
-
-                if (dist < hueThreshold && dist < bestHueMatch)
-                {
-                    bestHueMatch = dist;
-                    bestCat = j;
-                }
-            }
-
-            if (bestCat != -1)
-            {
-                hueCategories[s][bestCat].push_back(satGroup[i]);
-            }
-            else
-            {
-                hueReps.push_back(i);
-                hueCategories[s].push_back({ satGroup[i] });
-            }
-        }
-    }
-
+    colorCategories.erase(
+        std::remove_if(colorCategories.begin(), colorCategories.end(),
+            [](const auto& v) { return v.empty(); }),
+        colorCategories.end()
+    );
 
     return colorCategories;
 }

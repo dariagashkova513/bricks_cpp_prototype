@@ -1,10 +1,11 @@
 #include "include/yolov8_seg_pt.hpp"
+#include "include/color_space_cell.hpp"
 #include <iostream>
+#include <array>
 
 static const std::vector<std::string> COCO_CLASSES = {
     "brick"
 };
-
 
 //TODO: add performance metrics for testing
 int main(int argc, char** argv)
@@ -38,3 +39,16 @@ int main(int argc, char** argv)
     std::cout << "Saved annotated image to output_seg1_nolabel.jpg\n";
     return 0;
 }
+
+/*
+int main(int argc, char* argv[]) {
+
+    const double pr = std::stof(argv[1]);
+
+    DynamicGrid dgrid(pr);
+
+    std::array<double, 3> point = { 13.9998, 81.2123, 150.56 };
+    dgrid.getDCSS(point);
+
+    return 0;
+}*/
