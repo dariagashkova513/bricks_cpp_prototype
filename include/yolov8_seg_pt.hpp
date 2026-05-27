@@ -95,7 +95,7 @@ private:
     std::vector<std::vector<SegDetection>> sort_by_size(const std::vector<SegDetection>& detections) const;
     
     //sort nach farben
-    std::vector<std::vector<SegDetection>> sort_by_color(const cv::Mat& image, const std::vector<SegDetection>& detections, double percent) const;
+    std::vector<std::vector<SegDetection>> sort_by_color(const cv::Mat& image, const std::vector<SegDetection>& detections, double eps, int minPts) const;
 
     Ort::Env            env_;
     Ort::SessionOptions session_opts_;

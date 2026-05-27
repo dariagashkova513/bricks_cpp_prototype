@@ -29,9 +29,9 @@ int main(int argc, char** argv)
     for (const auto& d : detections) {
         const std::string& name = d.class_id < (int)COCO_CLASSES.size()
             ? COCO_CLASSES[d.class_id] : "cls" + std::to_string(d.class_id);
-        std::cout << "  [" << name << "]  conf=" << d.confidence
-                  << "  box=(" << d.box.x << "," << d.box.y
-                  << "," << d.box.width << "," << d.box.height << ")\n";
+        //std::cout << "  [" << name << "]  conf=" << d.confidence
+        //          << "  box=(" << d.box.x << "," << d.box.y
+        //          << "," << d.box.width << "," << d.box.height << ")\n";
     }
 
     cv::Mat annotated = detector.draw(image, detections, COCO_CLASSES);

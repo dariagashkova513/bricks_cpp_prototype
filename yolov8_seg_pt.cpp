@@ -1,5 +1,6 @@
 #include "include/yolov8_seg_pt.hpp"
 #include "include/color_space_cell.hpp"
+#include "include\color_histogram.hpp"
 
 #include <algorithm>
 #include <cassert>
@@ -9,6 +10,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+
 
 constexpr float CONF_PREPROCESS = 0.25f;
 // ============================================================
@@ -168,7 +170,7 @@ std::vector<Tile> YOLOv8Seg::tiling(const cv::Mat& image, int size=640, int step
             image(cv::Rect(x, y, valid_w, valid_h))
                 .copyTo(canvas(cv::Rect(0, 0, valid_w, valid_h)));
 
-            std::cout << "cut out the tile #"<<y<<"\n";
+            //std::cout << "cut out the tile #"<<y<<"\n";
 
             tiles.push_back({ canvas, x, y, valid_w, valid_h });
         }
@@ -444,7 +446,7 @@ std::vector<std::vector<SegDetection>> YOLOv8Seg::sort_by_size(const std::vector
             return a.size() > b.size();
         });
 
-    std::cout << categories.size() << "categories were found\n";
+    //std::cout << categories.size() << "categories were found\n";
     return categories;
 }
 
@@ -540,7 +542,7 @@ cv::Mat YOLOv8Seg::draw(const cv::Mat& image,
     float                            alpha) const
 {   
 
-    std::vector<std::vector<SegDetection>> brick_categories = sort_by_color(image, detections, 12.5);
+    std::vector<std::vector<SegDetection>> brick_categories = sort_by_color(image, detections, 2.0, 0);
     cv::Mat out = image.clone();
 
     const int num_categories = (int)brick_categories.size();
@@ -548,7 +550,7 @@ cv::Mat YOLOv8Seg::draw(const cv::Mat& image,
     for (int k = 0; k < num_categories; ++k)
         colors[k] = categoryColor(k, num_categories);
 
-    std::cout << "num categories: " << num_categories << "\n";
+   std::cout << "num categories: " << num_categories << "\n";
     
     for (size_t j = 0; j < brick_categories.size(); ++j) {
         const cv::Scalar& colour = colors[j];
@@ -765,9 +767,94 @@ cv::Scalar getAverageColor(const cv::Mat& image, const SegDetection& det)
     if (roiMask.size() != roiImage.size())
         cv::resize(roiMask, roiMask, roiImage.size(), 0, 0, cv::INTER_NEAREST);
 
-    return cv::mean(roiImage, roiMask);
+    cv::Scalar raw =
+        cv::mean(roiImage, roiMask);
+
+    return cv::Scalar(
+        raw[0] * 100.0 / 255.0,
+        raw[1] - 128.0,
+        raw[2] - 128.0
+    );
 }
 
+
+cv::Scalar getMedianLabColor(const cv::Mat& labImage, const SegDetection& det)
+{
+    cv::Rect safeBox = det.box & cv::Rect(0, 0, labImage.cols, labImage.rows);
+    if (safeBox.empty()) {
+        std::cout << "empty safe box" << "\n";
+        return cv::Scalar(0, 0, 0, 0);
+    }
+    cv::Mat roiImage = labImage(safeBox);
+    cv::Mat roiMask;
+
+    cv::Rect maskRect(det.mask_origin, safeBox.size());
+    cv::Rect safeMaskRect = maskRect & cv::Rect(0, 0, det.mask.cols, det.mask.rows);
+
+    if (!safeMaskRect.empty()) {
+        roiMask = det.mask(safeMaskRect);
+        if (roiMask.size() != roiImage.size())
+            cv::resize(roiMask, roiMask, roiImage.size(), 0, 0, cv::INTER_NEAREST);
+    }
+    else {
+        // No valid mask region - use all pixels in the ROI
+        roiMask = cv::Mat::ones(roiImage.size(), CV_8UC1) * 255;
+    }
+
+    if (roiMask.size() != roiImage.size())
+        cv::resize(roiMask, roiMask, roiImage.size(), 0, 0, cv::INTER_NEAREST);
+
+    // Collect masked pixels into separate channels
+    std::vector<double> Lvals, Avals, Bvals;
+    for (int y = 0; y < roiImage.rows; y++) {
+        for (int x = 0; x < roiImage.cols; x++) {
+            if (roiMask.at<uchar>(y, x) == 0) continue;
+            cv::Vec3b px = roiImage.at<cv::Vec3b>(y, x);
+            Lvals.push_back(px[0] * 100.0 / 255.0);
+            Avals.push_back(px[1] - 128.0);
+            Bvals.push_back(px[2] - 128.0);
+        }
+    }
+
+    if (Lvals.empty()) {
+        std::cout<< "empty L values" << "\n";
+        return cv::Scalar(0, 0, 0, 0);
+    }
+
+    // Median of each channel independently
+    auto median = [](std::vector<double>& v) -> double {
+        size_t mid = v.size() / 2;
+        std::nth_element(v.begin(), v.begin() + mid, v.end());
+        return v[mid];
+    };
+
+    //std::cout << median(Lvals) << " " << median(Avals) << " " << median(Bvals) << "\n";
+    double medianL = median(Lvals);
+    double medianA = median(Avals);
+    double medianB = median(Bvals);
+
+    Point3D medianPt = { medianL , medianA, medianB };
+    double bestDist = std::numeric_limits<double>::max();
+    Point3D truePt = medianPt;
+
+    for (int y = 0; y < roiImage.rows; y++) {
+        for (int x = 0; x < roiImage.cols; x++) {
+            if (roiMask.at<uchar>(y, x) == 0) continue;
+            cv::Vec3b px = roiImage.at<cv::Vec3b>(y, x);
+            Point3D candidate = {
+                px[0] * 100.0 / 255.0,
+                px[1] - 128.0,
+                px[2] - 128.0
+            };
+            double d = DBSCAN::euclidean(candidate, medianPt);
+            if (d < bestDist) { bestDist = d; truePt = candidate; }
+        }
+    }
+
+    return cv::Scalar(truePt[0], truePt[1], truePt[2]);
+}
+
+/*
 std::vector<std::vector<SegDetection>> YOLOv8Seg::sort_by_color(const cv::Mat& image,
     const std::vector<SegDetection>& detections, double percent) const
 {
@@ -776,7 +863,7 @@ std::vector<std::vector<SegDetection>> YOLOv8Seg::sort_by_color(const cv::Mat& i
 
     // Convert full image to HSV once
     cv::Mat hsvImage;
-    cv::cvtColor(image, hsvImage, cv::COLOR_BGR2HSV);
+    cv::cvtColor(image, hsvImage, cv::COLOR_BGR2Lab);
 
     // Compute average HSV color per detection (with safe ROI clamping)
     std::vector<cv::Scalar> hsvColors;
@@ -808,14 +895,12 @@ std::vector<std::vector<SegDetection>> YOLOv8Seg::sort_by_color(const cv::Mat& i
     DynamicGrid dgrid(percent);
 
 
-    for (int i = 0; i < detections.size(); i++) {
-        std::array<double, 3>point = { hsvColors[i][0], hsvColors[i][1], hsvColors[i][2] };
-        auto& colSubSpace = dgrid.getDCSS(point);
-        int id = colSubSpace.id;
-        
+    for (size_t i = 0; i < detections.size(); i++) {
+        std::array<double, 3> point = { hsvColors[i][0], hsvColors[i][1], hsvColors[i][2] };
+        auto colSubSpace = dgrid.getDCSS(point);
+        size_t id = static_cast<size_t>(colSubSpace.id);
         if (id >= colorCategories.size())
             colorCategories.resize(id + 1);
-
         colorCategories[id].push_back(detections[i]);
     }
 
@@ -826,4 +911,94 @@ std::vector<std::vector<SegDetection>> YOLOv8Seg::sort_by_color(const cv::Mat& i
     );
 
     return colorCategories;
+}
+*/
+
+/*
+cv::Scalar getHistogramLabColor(const cv::Mat& labImage, const SegDetection& det)
+{
+    cv::Rect safeBox = det.box & cv::Rect(0, 0, labImage.cols, labImage.rows);
+    if (safeBox.empty()) return cv::Scalar(0, 0, 0, 0);
+    cv::Mat roiImage = labImage(safeBox);
+
+    cv::Mat roiMask;
+    cv::Rect maskRect(det.mask_origin, safeBox.size());
+    cv::Rect safeMaskRect = maskRect & cv::Rect(0, 0, det.mask.cols, det.mask.rows);
+    if (!safeMaskRect.empty()) {
+        roiMask = det.mask(safeMaskRect);
+        if (roiMask.size() != roiImage.size())
+            cv::resize(roiMask, roiMask, roiImage.size(), 0, 0, cv::INTER_NEAREST);
+    }
+    else {
+        roiMask = cv::Mat::ones(roiImage.size(), CV_8UC1) * 255;
+    }
+
+    //LabHistogram hist("debug_" + std::to_string(det.box.x) + "_" +
+    //    std::to_string(det.box.y) + ".txt");
+
+    //hist.accumulate(roiImage, roiMask);
+
+    auto dominant = hist.dominantColor();
+    return cv::Scalar(dominant[0], dominant[1], dominant[2]);
+}
+*/
+
+std::vector<std::vector<SegDetection>> YOLOv8Seg::sort_by_color(const cv::Mat& image,
+    const std::vector<SegDetection>& detections, double eps, int minPts) const
+{
+    if (detections.empty()) return {};
+
+    cv::Mat labImage;
+    cv::cvtColor(image, labImage, cv::COLOR_BGR2Lab);
+
+    //cv::Vec3b inputPx = image.at<cv::Vec3b>(image.rows / 2, image.cols / 2);
+
+
+    std::vector<Point3D> labColors;
+    labColors.reserve(detections.size());
+    for (const auto& det : detections) {
+        cv::Scalar c = getMedianLabColor(labImage, det);
+        labColors.push_back({ c[0], c[1], c[2] });
+    }
+
+    /*
+    // Write results to a text file
+    std::ofstream outFile("lab_colors.txt");
+    if (!outFile.is_open())
+    {
+        std::cerr << "Error: Could not open output file." << std::endl;
+    }
+    else
+    {
+        for (size_t i = 0; i < labColors.size(); ++i)
+        {
+            //const cv::Scalar& c = labColors[i];
+            outFile
+                << labColors[i][0] << ", "
+                << labColors[i][1] << ", "
+                << labColors[i][2] << "\n";
+        }
+        outFile.close();
+    }
+    */
+
+    DBSCAN dbscan(eps, minPts);
+
+    std::vector<int> labels = dbscan.fit(labColors);
+
+    // Group detections by cluster label, discard noise (label == -1)
+    int maxLabel = *std::max_element(labels.begin(), labels.end());
+    std::vector<std::vector<SegDetection>> clusters(maxLabel + 1);
+
+    for (size_t i = 0; i < detections.size(); i++)
+        if (labels[i] >= 0)
+            clusters[labels[i]].push_back(detections[i]);
+
+    // Remove empty buckets
+    clusters.erase(
+        std::remove_if(clusters.begin(), clusters.end(),
+            [](const auto& v) { return v.empty(); }),
+        clusters.end());
+
+    return clusters;
 }
