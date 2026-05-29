@@ -542,7 +542,7 @@ cv::Mat YOLOv8Seg::draw(const cv::Mat& image,
     float                            alpha) const
 {   
 
-    std::vector<std::vector<SegDetection>> brick_categories = sort_by_color(image, detections, 2.0, 0);
+    std::vector<std::vector<SegDetection>> brick_categories = sort_by_color(image, detections, 2.5, 0);
     cv::Mat out = image.clone();
 
     const int num_categories = (int)brick_categories.size();
