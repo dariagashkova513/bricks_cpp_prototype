@@ -1002,3 +1002,161 @@ std::vector<std::vector<SegDetection>> YOLOv8Seg::sort_by_color(const cv::Mat& i
 
     return clusters;
 }
+
+void MLSeg::FThreadData::GetPolygons(void* pParam)
+{
+    FThreadData* pThData = (FThreadData*)pParam;
+    bool bResult = pThData->m_mlSeg.GetPolygons(pThData->m_vPolygons, pThData->m_is_a_box, pThData->m_image, pThData->m_conf_postprocess);
+    pThData->m_mlSeg.m_thInfos.EndThread(bResult);
+}
+
+/*
+std::vector<double> convertToPolyBox(SegDetection d)
+{
+    std::vector<double> polygon;
+
+    polygon = {
+            (double)d.box.x,
+            (double)d.box.y,
+            (double)(d.box.x + d.box.width),
+            (double)d.box.y,
+            (double)(d.box.x + d.box.width),
+            (double)(d.box.y + d.box.height),
+            (double)d.box.x,
+            (double)(d.box.y + d.box.height)
+    };
+
+    return polygon;
+}
+
+std::vector<double> convertToPolyMask(const cv::Mat& image, SegDetection d) {
+
+    std::vector<std::vector<cv::Point>> contours;
+    std::vector<double> poly;
+
+    cv::findContours(d.mask, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
+    if (contours.empty())
+        return poly;
+
+    poly.reserve(contours[0].size() * 2);
+    cv::Rect image_rect(0, 0, image.cols, image.rows);
+    cv::Rect roi_rect = d.box & image_rect;
+    for (const auto& pt : contours[0])
+    {
+        poly.push_back((double)(pt.x + roi_rect.x));
+        poly.push_back((double)(pt.y + roi_rect.y));
+    }
+
+    if (poly.size() >= 4)
+        return poly;
+
+    return poly;
+}
+
+// ============================================================
+//  GetPolygons uberführt 
+//  SegDetection Objekte in ein Koordinatenvektor.
+//  Gibt entweder BoundingBox- oder Maskenkoordinaten zurück.
+// ============================================================
+bool MLSeg::GetPolygons(std::vector<vector<double>>& vPolygons, bool is_a_box, const cv::Mat& image, const float conf_postprocess, bool bThread /* = false */
+)
+{
+    if (bThread)
+    {
+        FThreadData* pThData = new FThreadData{ vPolygons, is_a_box, image, conf_postprocess, *this };
+        return _beginthread(&FThreadData::GetPolygons, 0, pThData) != -1;
+    }
+
+    std::vector<SegDetection> detections = detect(image, conf_postprocess);
+    if (m_thInfos.m_bStopEvent)
+        return false;
+
+    vPolygons.reserve(detections.size());
+
+    switch (is_a_box)
+    {
+    case true:
+    {
+        for (const auto& d : detections)
+        {
+            vPolygons.push_back(convertToPolyBox(d));
+        }
+        break;
+    }
+    case false:
+    {
+        for (const auto& d : detections)
+        {
+            convertToPolyMask(image, d);
+        }
+        break;
+    }
+    }
+
+    return true;
+
+}
+
+
+//TODO: rewrite sort functions to work off polys,not of SegDet
+bool MLSeg::GetSortedPolygons(std::vector<std::vector<vector<double>>>& vSortedPolygons, bool is_a_box, const cv::Mat& image, const float conf_postprocess, bool sizeOrColor, bool bThread)
+{
+
+    /*if( bThread )
+    {
+        FThreadData *pThData = new FThreadData{ vSortedPolygons, is_a_box, image, conf_postprocess, *this };
+        return _beginthread( &FThreadData::GetPolygons, 0, pThData ) != -1;
+    }*/
+
+    std::vector<SegDetection> detections = detect(image, conf_postprocess);
+    if (m_thInfos.m_bStopEvent)
+        return false;
+
+    std::vector<std::vector<SegDetection>> sizeSortedDets = (sizeOrColor) ? sort_detections(detections) : sort_by_color(image, detections, 2.5, 1.0);
+
+    vSortedPolygons.resize(sizeSortedDets.size());
+
+    switch (is_a_box)
+    {
+    case true:
+    {
+        for (int i = 0; i < sizeSortedDets.size(); i++)
+        {
+            for (const auto& d : sizeSortedDets[i])
+            {
+                vSortedPolygons[i].push_back(convertToPolyBox(d));
+            }
+        }
+        break;
+    }
+    case false:
+    {
+        for (int i = 0; i < sizeSortedDets.size(); i++)
+        {
+            for (const auto& d : sizeSortedDets[i])
+            {
+                vSortedPolygons[i].push_back(convertToPolyMask(image, d));
+            }
+        }
+        break;
+    }
+    }
+
+    return true;
+}
+
+std::vector<unsigned long> MLSeg::GetColorsOfClusters()
+{
+    std::vector<unsigned long> colors;
+    colors.reserve(m_vColorClusters.size());
+    for (const auto& cc : m_vColorClusters)
+    {
+        // Packen als 0x00RRGGBB
+        unsigned long packed = (static_cast<unsigned long>(cc.red) << 16)
+            | (static_cast<unsigned long>(cc.green) << 8)
+            | static_cast<unsigned long>(cc.blue);
+        colors.push_back(packed);
+    }
+    return colors;
+}
+#endif  //  !VIEWER_MAP && !METIGO_MAP || _MAPEXT50 */
