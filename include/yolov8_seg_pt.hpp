@@ -11,13 +11,6 @@ constexpr float CONF_POSTPROCESS = 0.85f;
 // Data structures
 // ---------------------------------------------------------------------------
 
-struct WBFCluster {
-    std::vector<int>   members;   // indices into all_detections
-    cv::Rect2f         fused_box;
-    float              fused_score;
-    int                fused_class;
-};
-
 struct SegDetection {
     int      class_id;
     float    confidence;
@@ -83,11 +76,6 @@ private:
                          int             pad_w,
                          int             pad_h) const;
 
-    std::vector<WBFCluster> wbf(
-        const std::vector<SegDetection>& detections,
-        int image_w, int image_h,
-        float iou_thr = 0.1f,
-        float skip_thr = 0.01f) const;
 
     std::vector<SegDetection> delete_duplicates(const std::vector<SegDetection>& detections, const float iou_thresh_ = 0.05f) const;
 

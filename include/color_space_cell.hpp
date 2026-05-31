@@ -157,10 +157,9 @@ class DynamicGrid {
 
 public:
     static constexpr double L_AXIS = 100.0;
-    static constexpr double A_AXIS = 255.0;  // full range: -128..127  stored as 0..255
+    static constexpr double A_AXIS = 255.0;
     static constexpr double B_AXIS = 255.0;
 
-    // Offsets to shift a*, b* from [-128,127] into [0,255]
     static constexpr double A_OFFSET = 128.0;
     static constexpr double B_OFFSET = 128.0;
 
@@ -184,7 +183,6 @@ public:
             throw std::out_of_range("subspaceID " + std::to_string(subspaceID) +
                 " is out of range [0, " + std::to_string(total - 1) + "]");
 
-        // Shift to [0,255] storage space
         const Point3D shifted = toShifted(point);
 
         const int li = subspaceID / (divisions_ * divisions_);
@@ -208,10 +206,9 @@ public:
                 ") is not within subspace " + std::to_string(subspaceID));
     }
 
-    // Expects point in raw Lab: L*[0,100], a*[-128,127], b*[-128,127]
     [[nodiscard]]
     DetectedColorSubSpace getDCSS(Point3D point) {
-        // Clamp raw Lab inputs
+
         point[0] = std::clamp(point[0], 0.0, L_AXIS);
         point[1] = std::clamp(point[1], -128.0, 127.0);
         point[2] = std::clamp(point[2], -128.0, 127.0);
@@ -236,7 +233,6 @@ private:
     Vector3D cell_size_;
     Point3D  origin_;
 
-    // Shift raw a*, b* from [-128,127] into [0,255]; L* is already [0,100]
     [[nodiscard]]
     static Point3D toShifted(const Point3D& p) {
         return { p[0], p[1] + A_OFFSET, p[2] + B_OFFSET };
@@ -245,9 +241,9 @@ private:
     [[nodiscard]]
     std::string labCellToColorName(int li, int ai, int bi) const {
         // Normalise cell centres to [0,1]
-        const double L = ((li + 0.5) * cell_size_[0]) / L_AXIS;   // 0-1
-        const double A = ((ai + 0.5) * cell_size_[1]) / A_AXIS;   // 0-1  (0=green, 1=red)
-        const double B = ((bi + 0.5) * cell_size_[2]) / B_AXIS;   // 0-1  (0=blue, 1=yellow)
+        const double L = ((li + 0.5) * cell_size_[0]) / L_AXIS;
+        const double A = ((ai + 0.5) * cell_size_[1]) / A_AXIS;
+        const double B = ((bi + 0.5) * cell_size_[2]) / B_AXIS;
 
         // --- Lightness tier ---
         if (L < 0.20) return "Black";
@@ -255,18 +251,15 @@ private:
 
         const std::string lightness = (L < 0.40) ? "Dark" : (L < 0.65) ? "" : "Light";
 
-        // --- Chroma: distance from neutral axis (A=0.5, B=0.5 in normalised space) ---
         const double da = A - 0.5;
         const double db = B - 0.5;
 
-        const double chroma = std::sqrt(da * da + db * db);  // max ~0.707
+        const double chroma = std::sqrt(da * da + db * db); // 0-0.707
 
         if (chroma < 0.10) {
-            // Achromatic — lightness already handles Black/White above
             return (L < 0.40) ? "Dark Gray" : "Gray";
         }
 
-        // --- Hue angle in degrees (atan2 convention: 0°=+a* red, 90°=+b* yellow) ---
         const double hue = std::fmod(std::atan2(db, da) * (180.0 / PI) + 360.0, 360.0);
 
         std::string color;

@@ -1,6 +1,6 @@
 #include "include/yolov8_seg_pt.hpp"
 #include "include/color_space_cell.hpp"
-#include "include\color_histogram.hpp"
+#include "include/color_histogram.hpp"
 
 #include <algorithm>
 #include <cassert>
@@ -13,9 +13,6 @@
 
 
 constexpr float CONF_PREPROCESS = 0.25f;
-// ============================================================
-//  Colour palette
-// ============================================================
 
 /*const cv::Scalar YOLOv8Seg::kPalette[kPaletteSize] = {
     {255,  128,  256}
@@ -56,9 +53,7 @@ YOLOv8Seg::YOLOv8Seg(const std::string& model_path,
       conf_thresh_(conf_thresh),
       iou_thresh_(iou_thresh)
 {
-    // Input name
     { auto r = session_.GetInputNameAllocated(0, allocator_);  input_name_   = r.get(); }
-    // Two outputs: detection tensor + prototype masks
     { auto r = session_.GetOutputNameAllocated(0, allocator_); output0_name_ = r.get(); }
     { auto r = session_.GetOutputNameAllocated(1, allocator_); output1_name_ = r.get(); }
 }
@@ -88,13 +83,12 @@ std::vector<SegDetection> YOLOv8Seg::delete_duplicates(const std::vector<SegDete
     };
 
     // ── One box is almost entirely inside the other ──────────
-    //   catches the "small partial mask inside full mask" case
     auto is_contained = [](const cv::Rect& small, const cv::Rect& large) -> bool {
         const cv::Rect inter = small & large;
         if (inter.empty()) return false;
         const float overlap = static_cast<float>(inter.area())
             / static_cast<float>(small.area());
-        return overlap > 0.80f;   // 80% of smaller box covered by larger
+        return overlap > 0.80f;
     };
 
     // ── Sort indices by confidence descending ────────────────
@@ -119,21 +113,17 @@ std::vector<SegDetection> YOLOv8Seg::delete_duplicates(const std::vector<SegDete
 
             const bool iou_dup = rect_iou(di.box, dj.box) > iou_thresh_;
             const bool center_dup = center_in_box(di.box, dj.box);
-            const bool i_inside_j = is_contained(di.box, dj.box);  // di is the smaller
-            const bool j_inside_i = is_contained(dj.box, di.box);  // dj is the smaller
+            const bool i_inside_j = is_contained(di.box, dj.box);
+            const bool j_inside_i = is_contained(dj.box, di.box);
 
             if (iou_dup || center_dup) {
-                // Standard case — suppress lower confidence (j, already sorted)
                 suppressed[order[j]] = true;
             }
             else if (i_inside_j) {
-                // di is contained inside dj → di is the partial, suppress it
-                // regardless of confidence
                 suppressed[order[i]] = true;
-                break;  // order[i] is gone, stop inner loop
+                break;
             }
             else if (j_inside_i) {
-                // dj is contained inside di → dj is the partial, suppress it
                 suppressed[order[j]] = true;
             }
         }
@@ -149,7 +139,8 @@ std::vector<SegDetection> YOLOv8Seg::delete_duplicates(const std::vector<SegDete
     return result;
 }
 
-
+// tiling function: cut the image into overlapping tiles, pad with gray if needed
+// return tile data + metadata for remapping detections later
 std::vector<Tile> YOLOv8Seg::tiling(const cv::Mat& image, int size=640, int step=320)const
 {   
     std::vector<Tile> tiles;
@@ -210,7 +201,7 @@ cv::Mat YOLOv8Seg::preprocess(const cv::Mat& image,
 }
 
 // ============================================================
-//  detect
+//  detect: main pipeline
 // ============================================================
 
 std::vector<SegDetection> YOLOv8Seg::detect(
@@ -363,7 +354,6 @@ cv::Mat YOLOv8Seg::assembleMask(const float*    proto_data,
     //    proto_data layout: [nm, proto_h, proto_w]  (flat, row-major)
     cv::Mat combined(proto_h, proto_w, CV_32F, 0.f);
     for (int64_t k = 0; k < nm; ++k) {
-        // k-th prototype: starts at proto_data + k * proto_h * proto_w
         cv::Mat proto_k(proto_h, proto_w, CV_32F,
                         const_cast<float*>(proto_data) + k * proto_h * proto_w);
         combined += coeffs[k] * proto_k;
@@ -373,7 +363,6 @@ cv::Mat YOLOv8Seg::assembleMask(const float*    proto_data,
     cv::exp(-combined, combined);            // combined = e^(-x)
     combined = 1.f / (1.f + combined);       // sigmoid
 
-    // 3. Map box from original-image space → proto space
     const float proto_scale_x = static_cast<float>(proto_w) / input_size_;
     const float proto_scale_y = static_cast<float>(proto_h) / input_size_;
 
@@ -387,7 +376,6 @@ cv::Mat YOLOv8Seg::assembleMask(const float*    proto_data,
     const int px2 = std::clamp(static_cast<int>(std::ceil(lx2 * proto_scale_x)), px1 + 1, proto_w);
     const int py2 = std::clamp(static_cast<int>(std::ceil(ly2 * proto_scale_y)), py1 + 1, proto_h);
 
-    // 4. Crop proto region and resize to box dimensions
     cv::Mat cropped = combined(cv::Rect(px1, py1, px2 - px1, py2 - py1)).clone();
 
     // Clamp box to tile bounds before resizing
@@ -397,57 +385,16 @@ cv::Mat YOLOv8Seg::assembleMask(const float*    proto_data,
     const int safe_h = std::min(box.height, orig_h - safe_y);
 
     if (safe_w <= 0 || safe_h <= 0)
-        return cv::Mat();   // degenerate box — return empty mask
+        return cv::Mat();
 
     cv::Mat resized_mask;
     cv::resize(cropped, resized_mask, { safe_w, safe_h }, 0, 0, cv::INTER_LINEAR);
 
-    // 5. Threshold → binary CV_8U, sized to box
     cv::Mat binary;
     cv::threshold(resized_mask, binary, 0.5, 255, cv::THRESH_BINARY);
     binary.convertTo(binary, CV_8U);
 
     return binary;  // tile-local, placed by draw() using mask_origin
-}
-
-std::vector<std::vector<SegDetection>> YOLOv8Seg::sort_by_size(const std::vector<SegDetection>& detections) const
-{   
-    std::vector<std::vector<SegDetection>> categories;
-
-    for (int i = 0; i < (int)detections.size(); ++i) {
-          
-        double w = (double) detections[i].box.width;
-        double h = (double) detections[i].box.height;
-
-        int bestCat = -1;
-
-        for (int j = 0; j < (int)categories.size(); ++j) {
-            //0.1 +- faktor, wenn keine kategorien gefunden, mach neue
-            double cat_h = (double) categories[j][0].box.height;
-            double cat_w = (double)categories[j][0].box.width;
-            if (cat_h > cat_w) std::swap(cat_h, cat_w);
-            if ((h >= 0.8 * cat_h && h <= 1.2 * cat_h) && (w >= 0.8 * cat_w && w <= 1.2 * cat_w)) {            
-                bestCat = j;
-                break; 
-            }
-        }
-        if (bestCat != -1) {
-            categories[bestCat].push_back(detections[i]); // fix: was categories[i], should be categories[bestCat]
-        }
-        else {
-            categories.push_back({ detections[i] });
-            //std::cout << "new category\n";
-        }
-    }
-
-    //sort nach größe >
-    std::sort(categories.begin(), categories.end(),
-        [](const std::vector<SegDetection>& a, const std::vector<SegDetection>& b) {
-            return a.size() > b.size();
-        });
-
-    //std::cout << categories.size() << "categories were found\n";
-    return categories;
 }
 
 // ============================================================
@@ -531,6 +478,47 @@ YOLOv8Seg::postprocess(const float* det_data,   int64_t num_anchors, int64_t num
 
     return detections;
 }
+
+//Greedy clustering of detections by size
+std::vector<std::vector<SegDetection>> YOLOv8Seg::sort_by_size(const std::vector<SegDetection>& detections) const
+{   
+    std::vector<std::vector<SegDetection>> categories;
+
+    for (int i = 0; i < (int)detections.size(); ++i) {
+          
+        double w = (double) detections[i].box.width;
+        double h = (double) detections[i].box.height;
+
+        int bestCat = -1;
+
+        for (int j = 0; j < (int)categories.size(); ++j) {
+            double cat_h = (double) categories[j][0].box.height;
+            double cat_w = (double)categories[j][0].box.width;
+            if (cat_h > cat_w) std::swap(cat_h, cat_w);
+            if ((h >= 0.8 * cat_h && h <= 1.2 * cat_h) && (w >= 0.8 * cat_w && w <= 1.2 * cat_w)) {            
+                bestCat = j;
+                break; 
+            }
+        }
+        if (bestCat != -1) {
+            categories[bestCat].push_back(detections[i]);
+        }
+        else {
+            categories.push_back({ detections[i] });
+            //std::cout << "new category\n";
+        }
+    }
+
+    //descending sort
+    std::sort(categories.begin(), categories.end(),
+        [](const std::vector<SegDetection>& a, const std::vector<SegDetection>& b) {
+            return a.size() > b.size();
+        });
+
+    //std::cout << categories.size() << "categories were found\n";
+    return categories;
+}
+
 
 // ============================================================
 //  draw
@@ -619,129 +607,6 @@ cv::Mat YOLOv8Seg::draw(const cv::Mat& image,
     }
     return out;
 }
-
-// ============================================================
-//  WBF  — Weighted Boxes Fusion (cross-tile global merge)
-//  Fuses boxes from overlapping tiles instead of suppressing.
-//  Returns clusters; caller composites masks from d.members.
-// ============================================================
-std::vector<WBFCluster> YOLOv8Seg::wbf(
-    const std::vector<SegDetection>& dets,
-    int image_w, int image_h,
-    float iou_thr, float skip_thr) const
-{
-    // Normalise boxes to [0,1]
-    const float iw = static_cast<float>(image_w);
-    const float ih = static_cast<float>(image_h);
-
-    struct NBox {
-        float x1, y1, x2, y2, score;
-        int   class_id, orig_idx;
-    };
-
-    // Filter and normalise
-    std::vector<NBox> nboxes;
-    nboxes.reserve(dets.size());
-    for (int i = 0; i < (int)dets.size(); ++i) {
-        if (dets[i].confidence < skip_thr) continue;
-        const auto& b = dets[i].box;
-        nboxes.push_back({
-            b.x / iw,
-            b.y / ih,
-            (b.x + b.width) / iw,
-            (b.y + b.height) / ih,
-            dets[i].confidence,
-            dets[i].class_id,
-            i
-            });
-    }
-
-    // Sort descending by score
-    std::sort(nboxes.begin(), nboxes.end(),
-        [](const NBox& a, const NBox& b) { return a.score > b.score; });
-
-    // ── IoU helper ───────────────────────────────────────────
-    auto iou = [](const NBox& a, const NBox& b) -> float {
-        const float ix1 = std::max(a.x1, b.x1);
-        const float iy1 = std::max(a.y1, b.y1);
-        const float ix2 = std::min(a.x2, b.x2);
-        const float iy2 = std::min(a.y2, b.y2);
-        const float inter = std::max(0.f, ix2 - ix1) * std::max(0.f, iy2 - iy1);
-        if (inter == 0.f) return 0.f;
-        const float area_a = (a.x2 - a.x1) * (a.y2 - a.y1);
-        const float area_b = (b.x2 - b.x1) * (b.y2 - b.y1);
-        return inter / (area_a + area_b - inter);
-    };
-
-    // ── Cluster boxes ────────────────────────────────────────
-    // Each cluster accumulates weighted box coordinates
-    struct Cluster {
-        std::vector<NBox> boxes;   // all members
-        // running weighted sums
-        float wx1 = 0, wy1 = 0, wx2 = 0, wy2 = 0, wsum = 0;
-    };
-    std::vector<Cluster> clusters;
-
-    for (const auto& nb : nboxes) {
-        bool matched = false;
-        for (auto& cl : clusters) {
-            // Compare against the current fused box of the cluster
-            NBox fused{
-                cl.wx1 / cl.wsum, cl.wy1 / cl.wsum,
-                cl.wx2 / cl.wsum, cl.wy2 / cl.wsum,
-                0.f, nb.class_id, -1
-            };
-            if (nb.class_id == cl.boxes[0].class_id && iou(nb, fused) > iou_thr) {
-                cl.boxes.push_back(nb);
-                cl.wx1 += nb.score * nb.x1;
-                cl.wy1 += nb.score * nb.y1;
-                cl.wx2 += nb.score * nb.x2;
-                cl.wy2 += nb.score * nb.y2;
-                cl.wsum += nb.score;
-                matched = true;
-                break;
-            }
-        }
-        if (!matched) {
-            Cluster cl;
-            cl.boxes.push_back(nb);
-            cl.wx1 = nb.score * nb.x1;
-            cl.wy1 = nb.score * nb.y1;
-            cl.wx2 = nb.score * nb.x2;
-            cl.wy2 = nb.score * nb.y2;
-            cl.wsum = nb.score;
-            clusters.push_back(std::move(cl));
-        }
-    }
-
-    // ── Build output ─────────────────────────────────────────
-    std::vector<WBFCluster> result;
-    result.reserve(clusters.size());
-
-    for (const auto& cl : clusters) {
-        // Fused score = avg of top members (WBF paper formula)
-        float fused_score = cl.wsum / static_cast<float>(cl.boxes.size());
-        if (fused_score < skip_thr) continue;
-
-        // Denormalise fused box back to pixel coords
-        const float fx1 = (cl.wx1 / cl.wsum) * iw;
-        const float fy1 = (cl.wy1 / cl.wsum) * ih;
-        const float fx2 = (cl.wx2 / cl.wsum) * iw;
-        const float fy2 = (cl.wy2 / cl.wsum) * ih;
-
-        WBFCluster out;
-        out.fused_box = { fx1, fy1, fx2 - fx1, fy2 - fy1 };
-        out.fused_score = fused_score;
-        out.fused_class = cl.boxes[0].class_id;
-        for (const auto& nb : cl.boxes)
-            out.members.push_back(nb.orig_idx);
-
-        result.push_back(std::move(out));
-    }
-
-    return result;
-}
-
 
 
 const double kMaxHsvDistance = std::sqrt(180.0 * 180.0 + 255.0 * 255.0 + 255.0 * 255.0);
@@ -1003,14 +868,6 @@ std::vector<std::vector<SegDetection>> YOLOv8Seg::sort_by_color(const cv::Mat& i
     return clusters;
 }
 
-void MLSeg::FThreadData::GetPolygons(void* pParam)
-{
-    FThreadData* pThData = (FThreadData*)pParam;
-    bool bResult = pThData->m_mlSeg.GetPolygons(pThData->m_vPolygons, pThData->m_is_a_box, pThData->m_image, pThData->m_conf_postprocess);
-    pThData->m_mlSeg.m_thInfos.EndThread(bResult);
-}
-
-/*
 std::vector<double> convertToPolyBox(SegDetection d)
 {
     std::vector<double> polygon;
@@ -1054,22 +911,12 @@ std::vector<double> convertToPolyMask(const cv::Mat& image, SegDetection d) {
 }
 
 // ============================================================
-//  GetPolygons uberführt 
-//  SegDetection Objekte in ein Koordinatenvektor.
-//  Gibt entweder BoundingBox- oder Maskenkoordinaten zurück.
+//  GetPolygons transforms detections into polygon representations, either as bounding boxes or mask contours.
 // ============================================================
-bool MLSeg::GetPolygons(std::vector<vector<double>>& vPolygons, bool is_a_box, const cv::Mat& image, const float conf_postprocess, bool bThread /* = false */
-)
+bool MLSeg::GetPolygons(std::vector<vector<double>>& vPolygons, bool is_a_box, const cv::Mat& image, const float conf_postprocess)
 {
-    if (bThread)
-    {
-        FThreadData* pThData = new FThreadData{ vPolygons, is_a_box, image, conf_postprocess, *this };
-        return _beginthread(&FThreadData::GetPolygons, 0, pThData) != -1;
-    }
-
+    
     std::vector<SegDetection> detections = detect(image, conf_postprocess);
-    if (m_thInfos.m_bStopEvent)
-        return false;
 
     vPolygons.reserve(detections.size());
 
@@ -1097,16 +944,14 @@ bool MLSeg::GetPolygons(std::vector<vector<double>>& vPolygons, bool is_a_box, c
 
 }
 
-
-//TODO: rewrite sort functions to work off polys,not of SegDet
+// ============================================================
+//  GetSortedPolygons is a getter for sorted polygons, which are grouped by size or color.
+//  The sorting method is determined by the sizeOrColor flag.
+//  It returns a vector of vector of polygons, where each inner vector represents a category of polygons.
+//  If is_a_box is true, it returns bounding box coordinates; otherwise, it returns mask contours.
+// ============================================================
 bool MLSeg::GetSortedPolygons(std::vector<std::vector<vector<double>>>& vSortedPolygons, bool is_a_box, const cv::Mat& image, const float conf_postprocess, bool sizeOrColor, bool bThread)
 {
-
-    /*if( bThread )
-    {
-        FThreadData *pThData = new FThreadData{ vSortedPolygons, is_a_box, image, conf_postprocess, *this };
-        return _beginthread( &FThreadData::GetPolygons, 0, pThData ) != -1;
-    }*/
 
     std::vector<SegDetection> detections = detect(image, conf_postprocess);
     if (m_thInfos.m_bStopEvent)
@@ -1151,7 +996,7 @@ std::vector<unsigned long> MLSeg::GetColorsOfClusters()
     colors.reserve(m_vColorClusters.size());
     for (const auto& cc : m_vColorClusters)
     {
-        // Packen als 0x00RRGGBB
+        // Pack as 0x00RRGGBB
         unsigned long packed = (static_cast<unsigned long>(cc.red) << 16)
             | (static_cast<unsigned long>(cc.green) << 8)
             | static_cast<unsigned long>(cc.blue);
@@ -1159,4 +1004,3 @@ std::vector<unsigned long> MLSeg::GetColorsOfClusters()
     }
     return colors;
 }
-#endif  //  !VIEWER_MAP && !METIGO_MAP || _MAPEXT50 */

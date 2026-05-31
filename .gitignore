@@ -20,6 +20,7 @@
 
 build/
 models/
+model/
 out/
 CMakeFiles/
 .vs/

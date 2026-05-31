@@ -69,7 +69,7 @@ private:
         f << "li ai bi count L_centre a_centre b_centre\n";
 
         for (int i = 0; i < TOTAL; i++) {
-            if (hist_[i] == 0) continue;  // skip empty bins
+            if (hist_[i] == 0) continue;
 
             int li = i / (A_BINS * B_BINS);
             int ai = (i / B_BINS) % A_BINS;
