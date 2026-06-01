@@ -20,6 +20,7 @@ struct WBFCluster {
 
 struct SegDetection {
     int      class_id;
+    int      id;
     float    confidence;
     cv::Rect box;       // bounding box in original-image pixel space
     cv::Mat  mask;      // binary mask (CV_8UC1), same size as original image
@@ -57,6 +58,8 @@ public:
                  const std::vector<std::string>&   class_names = {},
                  float                             alpha       = 0.45f) const;
 
+   
+
 private:
 
     std::vector<Tile> tiling(const cv::Mat& image, int size, int step) const;
@@ -83,12 +86,6 @@ private:
                          int             pad_w,
                          int             pad_h) const;
 
-    std::vector<WBFCluster> wbf(
-        const std::vector<SegDetection>& detections,
-        int image_w, int image_h,
-        float iou_thr = 0.1f,
-        float skip_thr = 0.01f) const;
-
     std::vector<SegDetection> delete_duplicates(const std::vector<SegDetection>& detections, const float iou_thresh_ = 0.05f) const;
 
     //statistische sort nach größe
@@ -96,6 +93,8 @@ private:
     
     //sort nach farben
     std::vector<std::vector<SegDetection>> sort_by_color(const cv::Mat& image, const std::vector<SegDetection>& detections, double eps, int minPts) const;
+
+    bool getHistogramLabColor(const cv::Mat& labImage, const std::vector<SegDetection>& detections) const;
 
     Ort::Env            env_;
     Ort::SessionOptions session_opts_;

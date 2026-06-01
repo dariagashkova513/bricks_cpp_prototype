@@ -37,6 +37,8 @@ int main(int argc, char** argv)
     cv::Mat annotated = detector.draw(image, detections, COCO_CLASSES);
     cv::imwrite("output_seg1_nolabel.jpg", annotated);
     std::cout << "Saved annotated image to output_seg1_nolabel.jpg\n";
+
+    
     return 0;
 }
 
