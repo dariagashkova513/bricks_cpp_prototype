@@ -2,6 +2,7 @@
 #include "include/color_space_cell.hpp"
 #include <iostream>
 #include <array>
+#include <cstdlib>
 
 static const std::vector<std::string> COCO_CLASSES = {
     "brick"
@@ -29,15 +30,35 @@ int main(int argc, char** argv)
     for (const auto& d : detections) {
         const std::string& name = d.class_id < (int)COCO_CLASSES.size()
             ? COCO_CLASSES[d.class_id] : "cls" + std::to_string(d.class_id);
-        //std::cout << "  [" << name << "]  conf=" << d.confidence
-        //          << "  box=(" << d.box.x << "," << d.box.y
-        //          << "," << d.box.width << "," << d.box.height << ")\n";
+        std::cout //<< "  [" << name << "]  conf=" << d.confidence
+                  << "  box=(" << d.box.x << "," << d.box.y
+                  << "," << d.box.width << "," << d.box.height << ")\n";
     }
 
     cv::Mat annotated = detector.draw(image, detections, COCO_CLASSES);
     cv::imwrite("output_seg1_nolabel.jpg", annotated);
     std::cout << "Saved annotated image to output_seg1_nolabel.jpg\n";
 
+    std::vector<std::vector<double>> polys;
+
+    for (auto d : detections) {
+        std::vector<double> poly = detector.convertToPolyMask(image, d);
+        polys.push_back(poly);
+    }
+    
+    std::vector<SegDetection> detections_redone =
+        detector.convertDoublePolyCoordsInSegDetection(polys, image);
+
+    std::cout << "Generated " << detections_redone.size() << " detections:\n";
+    for (const auto& det : detections_redone) {
+        std::cout << "  [" << det.id << "]"
+            << "  box=" << det.box
+            << "  mask non-zero px=" << cv::countNonZero(det.mask)
+            << "\n";
+    }
+    cv::Mat refurb = detector.draw(image, detections_redone, COCO_CLASSES);
+    cv::imwrite("output_detections_to_polys_to_detections.jpg", refurb);
+    std::cout << "Saved annotated image toutput_detections_to_polys_to_detections.jpg\n";
     
     return 0;
 }
@@ -54,3 +75,5 @@ int main(int argc, char* argv[]) {
 
     return 0;
 }*/
+
+//constexpr double PI = 3.14159265358979323846;

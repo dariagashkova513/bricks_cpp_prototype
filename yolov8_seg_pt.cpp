@@ -862,6 +862,67 @@ std::vector<std::vector<SegDetection>> YOLOv8Seg::sort_by_color(const cv::Mat& i
 
     return clusters;
 }
+
+std::vector<SegDetection> YOLOv8Seg::convertDoublePolyCoordsInSegDetection(
+    const std::vector<std::vector<double>> polys,
+    const cv::Mat& image)
+{
+    std::vector<SegDetection> detections;
+    detections.resize(polys.size());
+
+    for (size_t i = 0; i < polys.size(); i++) {
+
+        detections[i].id = i;
+
+        // Build integer polygon from flat [x0, y0, x1, y1, ...] doubles
+        std::vector<cv::Point> intPolygon;
+        intPolygon.reserve(polys[i].size() / 2);
+
+        for (size_t j = 0; j + 1 < polys[i].size(); j += 2) {
+            intPolygon.emplace_back(
+                static_cast<int>(std::round(polys[i][j])),  // x
+                static_cast<int>(std::round(polys[i][j + 1]))   // y
+            );
+        }
+
+        // Create and fill mask
+        cv::Mat detMask = cv::Mat::zeros(image.size(), CV_8UC1);
+        std::vector<std::vector<cv::Point>> contours = { intPolygon };
+        cv::fillPoly(detMask, contours, cv::Scalar(255));
+        detections[i].mask = detMask;
+
+        // Compute bounding box from the polygon points
+        detections[i].box = cv::boundingRect(intPolygon);
+    }
+
+    return detections;
+}
+
+std::vector<double> YOLOv8Seg::convertToPolyMask(const cv::Mat& image, SegDetection d) {
+
+    std::vector<std::vector<cv::Point>> contours;
+    std::vector<double> poly;
+
+    cv::findContours(d.mask, contours, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
+    if (contours.empty())
+        return poly;
+
+    poly.reserve(contours[0].size() * 2);
+    cv::Rect image_rect(0, 0, image.cols, image.rows);
+    cv::Rect roi_rect = d.box & image_rect;
+    for (const auto& pt : contours[0])
+    {
+        poly.push_back((double)(pt.x + roi_rect.x));
+        poly.push_back((double)(pt.y + roi_rect.y));
+    }
+
+    if (poly.size() >= 4)
+        return poly;
+
+    return poly;
+}
+
+
 /*
 void MLSeg::FThreadData::GetPolygons(void* pParam)
 {

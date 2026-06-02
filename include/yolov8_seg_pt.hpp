@@ -58,7 +58,11 @@ public:
                  const std::vector<std::string>&   class_names = {},
                  float                             alpha       = 0.45f) const;
 
-   
+    static std::vector<SegDetection> convertDoublePolyCoordsInSegDetection(
+        const std::vector<std::vector<double>> polys,
+        const cv::Mat& image);
+
+    std::vector<double> convertToPolyMask(const cv::Mat& image, SegDetection d);
 
 private:
 
