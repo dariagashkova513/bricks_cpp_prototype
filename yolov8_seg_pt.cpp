@@ -543,7 +543,8 @@ cv::Mat YOLOv8Seg::draw(const cv::Mat& image,
     for (size_t j = 0; j < brick_categories.size(); ++j) {
         const cv::Scalar& colour = colors[j];
         for (size_t i = 0; i < brick_categories[j].size(); ++i) {
-            const auto& d = brick_categories[j][i];     
+            const auto& d = brick_categories[j][i];  
+            sort_by_individual_color_uniformity(d);
             /*
             // --- mask overlay ---
             if (!d.mask.empty()) {
@@ -866,6 +867,27 @@ std::vector<std::vector<SegDetection>> YOLOv8Seg::sort_by_color(const cv::Mat& i
         clusters.end());
 
     return clusters;
+}
+
+void YOLOv8Seg::sort_by_individual_color_uniformity(const SegDetection& detection) const{
+   
+    LabHistogram histogram("debug_" + std::to_string(det.box.x) + "_" + std::to_string(det.box.y) + ".txt");
+
+    auto colors = histogram.sortedColors();
+    
+    colors.resize(5);
+
+    std::vector<Point3D> labColors;
+    for (auto c : colors) {
+        labColors.push_back({ c[1], c[2], c[3] });
+    }
+
+    DBSCAN dbscan(5, 1);
+
+    std::vector<int> labels = dbscan.fit(labColors);
+
+    std::cout << "brick has " << labels.size() << "dominant colors \n";s
+
 }
 
 std::vector<double> convertToPolyBox(SegDetection d)
