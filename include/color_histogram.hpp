@@ -6,6 +6,12 @@
 #include <array>
 #include <opencv2/opencv.hpp>
 
+
+struct ColorBin {
+    int count;
+    std::array<double, 3> lab; // L, a, b centres
+};
+
 class LabHistogram {
 public:
     static constexpr int L_BINS = 20;
@@ -50,6 +56,33 @@ public:
             ((ai + 0.5) / A_BINS) * 256.0 - 128.0,
             ((bi + 0.5) / B_BINS) * 256.0 - 128.0
         };
+    }
+
+    std::vector<ColorBin> sortedColors() const {
+        std::vector<ColorBin> bins;
+        bins.reserve(TOTAL);
+
+        for (int i = 0; i < TOTAL; i++) {
+            if (hist_[i] == 0) continue;
+            int li = i / (A_BINS * B_BINS);
+            int ai = (i / B_BINS) % A_BINS;
+            int bi = i % B_BINS;
+            bins.push_back({
+                hist_[i],
+                {
+                    ((li + 0.5) / L_BINS) * 100.0,
+                    ((ai + 0.5) / A_BINS) * 256.0 - 128.0,
+                    ((bi + 0.5) / B_BINS) * 256.0 - 128.0
+                }
+                });
+        }
+
+        std::sort(bins.begin(), bins.end(),
+            [](const ColorBin& a, const ColorBin& b) {
+                return a.count > b.count; // descending
+            });
+
+        return bins;
     }
 
     void reset() {
