@@ -7,7 +7,6 @@ static const std::vector<std::string> COCO_CLASSES = {
     "brick"
 };
 
-//TODO: add performance metrics for testing
 int main(int argc, char** argv)
 {
     if (argc < 3) {

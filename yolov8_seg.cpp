@@ -530,7 +530,7 @@ cv::Mat YOLOv8Seg::draw(const cv::Mat& image,
     float                            alpha) const
 {   
 
-    std::vector<std::vector<SegDetection>> brick_categories = sort_by_color(image, detections, 2.5, 0);
+    std::vector<std::vector<SegDetection>> brick_categories = sort_by_size( detections);
     cv::Mat out = image.clone();
 
     const int num_categories = (int)brick_categories.size();
@@ -544,8 +544,8 @@ cv::Mat YOLOv8Seg::draw(const cv::Mat& image,
         const cv::Scalar& colour = colors[j];
         for (size_t i = 0; i < brick_categories[j].size(); ++i) {
             const auto& d = brick_categories[j][i];  
-            sort_by_individual_color_uniformity(d);
-            /*
+            sort_by_individual_color_uniformity(image, d);
+            
             // --- mask overlay ---
             if (!d.mask.empty()) {
                 cv::Rect image_rect(0, 0, out.cols, out.rows);
@@ -585,7 +585,7 @@ cv::Mat YOLOv8Seg::draw(const cv::Mat& image,
                     cv::addWeighted(roi_img, 1.0, masked_overlay, alpha, 0.0, roi_img);
                 }
             }
-            */
+
             // --- bounding box ---
             cv::rectangle(out, d.box, colour, 2);
             /*
@@ -869,25 +869,58 @@ std::vector<std::vector<SegDetection>> YOLOv8Seg::sort_by_color(const cv::Mat& i
     return clusters;
 }
 
-void YOLOv8Seg::sort_by_individual_color_uniformity(const SegDetection& detection) const{
-   
-    LabHistogram histogram("debug_" + std::to_string(det.box.x) + "_" + std::to_string(det.box.y) + ".txt");
-
-    auto colors = histogram.sortedColors();
-    
-    colors.resize(5);
-
-    std::vector<Point3D> labColors;
-    for (auto c : colors) {
-        labColors.push_back({ c[1], c[2], c[3] });
+void YOLOv8Seg::sort_by_individual_color_uniformity(const cv::Mat& image, const SegDetection& detection) const
+{
+    cv::Rect safeBox = detection.box & cv::Rect(0, 0, image.cols, image.rows);
+    if (safeBox.empty()) {
+        std::cout << "sort_by_individual_color_uniformity: empty detection box\n";
+        return;
     }
 
-    DBSCAN dbscan(5, 1);
+    cv::Mat roiImage = image(safeBox);
+    cv::Mat labImage;
+    cv::cvtColor(roiImage, labImage, cv::COLOR_BGR2Lab);
 
+    cv::Mat roiMask;
+    cv::Rect maskRect(detection.mask_origin, safeBox.size());
+    cv::Rect safeMaskRect = maskRect & cv::Rect(0, 0, detection.mask.cols, detection.mask.rows);
+    if (!safeMaskRect.empty()) {
+        roiMask = detection.mask(safeMaskRect);
+        if (roiMask.size() != roiImage.size())
+            cv::resize(roiMask, roiMask, roiImage.size(), 0, 0, cv::INTER_NEAREST);
+    } else {
+        roiMask = cv::Mat::ones(roiImage.size(), CV_8UC1) * 255;
+    }
+
+    std::string debugPath = "debug_" + std::to_string(detection.box.x) + "_" + std::to_string(detection.box.y) + ".txt";
+    LabHistogram histogram(debugPath);
+    histogram.accumulate(labImage, roiMask);
+
+    auto colors = histogram.sortedColors();
+    if (colors.empty()) {
+        std::cout << "sort_by_individual_color_uniformity: no colors found\n";
+        return;
+    }
+
+    if (colors.size() > 5)
+        colors.resize(5);
+
+    std::vector<Point3D> labColors;
+    labColors.reserve(colors.size());
+    for (const auto& c : colors) {
+        labColors.push_back({ c.lab[0], c.lab[1], c.lab[2] });
+    }
+
+    DBSCAN dbscan(5.0, 1);
     std::vector<int> labels = dbscan.fit(labColors);
 
-    std::cout << "brick has " << labels.size() << "dominant colors \n";s
+    int clusterCount = 0;
+    for (int label : labels)
+        if (label >= 0)
+            clusterCount = std::max(clusterCount, label + 1);
 
+    std::cout << "brick has " << clusterCount << " dominant color cluster(s) from "
+              << labels.size() << " candidates\n";
 }
 
 std::vector<double> convertToPolyBox(SegDetection d)

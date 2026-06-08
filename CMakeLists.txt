@@ -20,7 +20,7 @@ else()
     find_library(ORT_LIBS NAMES onnxruntime REQUIRED)
 endif()
 
-# Segmentation
+# Executables
 add_executable(yolov8_seg main.cpp yolov8_seg.cpp)
 target_include_directories(yolov8_seg PRIVATE ${OpenCV_INCLUDE_DIRS} ${ORT_INCLUDE_DIRS})
 target_link_libraries(yolov8_seg PRIVATE ${OpenCV_LIBS} ${ORT_LIBS})
