@@ -910,6 +910,7 @@ std::vector<double> convertToPolyMask(const cv::Mat& image, SegDetection d) {
     return poly;
 }
 
+/*
 // ============================================================
 //  GetPolygons transforms detections into polygon representations, either as bounding boxes or mask contours.
 // ============================================================
@@ -1004,3 +1005,4 @@ std::vector<unsigned long> MLSeg::GetColorsOfClusters()
     }
     return colors;
 }
+    */
