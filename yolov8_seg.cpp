@@ -530,7 +530,7 @@ cv::Mat YOLOv8Seg::draw(const cv::Mat& image,
     float                            alpha) const
 {   
 
-    std::vector<std::vector<SegDetection>> brick_categories = sort_by_color(image, detections, 2.5, 0);
+    std::vector<std::vector<SegDetection>> brick_categories = sort_by_size( detections);
     cv::Mat out = image.clone();
 
     const int num_categories = (int)brick_categories.size();
@@ -544,8 +544,13 @@ cv::Mat YOLOv8Seg::draw(const cv::Mat& image,
         const cv::Scalar& colour = colors[j];
         for (size_t i = 0; i < brick_categories[j].size(); ++i) {
             const auto& d = brick_categories[j][i];  
+<<<<<<< HEAD:yolov8_seg_pt.cpp
 
             /*
+=======
+            sort_by_individual_color_uniformity(image, d);
+            
+>>>>>>> 37d935d16541a5f511d10402a8b7830ab0d4312e:yolov8_seg.cpp
             // --- mask overlay ---
             if (!d.mask.empty()) {
                 cv::Rect image_rect(0, 0, out.cols, out.rows);
@@ -585,7 +590,7 @@ cv::Mat YOLOv8Seg::draw(const cv::Mat& image,
                     cv::addWeighted(roi_img, 1.0, masked_overlay, alpha, 0.0, roi_img);
                 }
             }
-            */
+
             // --- bounding box ---
             cv::rectangle(out, d.box, colour, 2);
             /*
@@ -874,6 +879,7 @@ std::vector<std::vector<SegDetection>> YOLOv8Seg::sort_by_color(const cv::Mat& i
     return clusters;
 }
 
+<<<<<<< HEAD:yolov8_seg_pt.cpp
 void YOLOv8Seg::sort_by_individual_color_uniformity(const cv::Mat& labImage, const SegDetection& detection) const{
    
     cv::Rect safeBox = detection.box & cv::Rect(0, 0, labImage.cols, labImage.rows);
@@ -906,9 +912,54 @@ void YOLOv8Seg::sort_by_individual_color_uniformity(const cv::Mat& labImage, con
     }
 
     DBSCAN dbscan(20, 1);
+=======
+void YOLOv8Seg::sort_by_individual_color_uniformity(const cv::Mat& image, const SegDetection& detection) const
+{
+    cv::Rect safeBox = detection.box & cv::Rect(0, 0, image.cols, image.rows);
+    if (safeBox.empty()) {
+        std::cout << "sort_by_individual_color_uniformity: empty detection box\n";
+        return;
+    }
 
+    cv::Mat roiImage = image(safeBox);
+    cv::Mat labImage;
+    cv::cvtColor(roiImage, labImage, cv::COLOR_BGR2Lab);
+>>>>>>> 37d935d16541a5f511d10402a8b7830ab0d4312e:yolov8_seg.cpp
+
+    cv::Mat roiMask;
+    cv::Rect maskRect(detection.mask_origin, safeBox.size());
+    cv::Rect safeMaskRect = maskRect & cv::Rect(0, 0, detection.mask.cols, detection.mask.rows);
+    if (!safeMaskRect.empty()) {
+        roiMask = detection.mask(safeMaskRect);
+        if (roiMask.size() != roiImage.size())
+            cv::resize(roiMask, roiMask, roiImage.size(), 0, 0, cv::INTER_NEAREST);
+    } else {
+        roiMask = cv::Mat::ones(roiImage.size(), CV_8UC1) * 255;
+    }
+
+    std::string debugPath = "debug_" + std::to_string(detection.box.x) + "_" + std::to_string(detection.box.y) + ".txt";
+    LabHistogram histogram(debugPath);
+    histogram.accumulate(labImage, roiMask);
+
+    auto colors = histogram.sortedColors();
+    if (colors.empty()) {
+        std::cout << "sort_by_individual_color_uniformity: no colors found\n";
+        return;
+    }
+
+    if (colors.size() > 5)
+        colors.resize(5);
+
+    std::vector<Point3D> labColors;
+    labColors.reserve(colors.size());
+    for (const auto& c : colors) {
+        labColors.push_back({ c.lab[0], c.lab[1], c.lab[2] });
+    }
+
+    DBSCAN dbscan(5.0, 1);
     std::vector<int> labels = dbscan.fit(labColors);
 
+<<<<<<< HEAD:yolov8_seg_pt.cpp
     // Keep only the first (highest-weight) color per cluster
     // sortedColors() is already sorted by count descending, so the first
     // occurrence of each cluster ID is the dominant one
@@ -939,7 +990,15 @@ void YOLOv8Seg::sort_by_individual_color_uniformity(const cv::Mat& labImage, con
             << "  b=" << c.lab[2]
             << "\n";
     }
+=======
+    int clusterCount = 0;
+    for (int label : labels)
+        if (label >= 0)
+            clusterCount = std::max(clusterCount, label + 1);
+>>>>>>> 37d935d16541a5f511d10402a8b7830ab0d4312e:yolov8_seg.cpp
 
+    std::cout << "brick has " << clusterCount << " dominant color cluster(s) from "
+              << labels.size() << " candidates\n";
 }
 
 std::vector<double> convertToPolyBox(SegDetection d)

@@ -85,7 +85,11 @@ private:
     //sort nach farben
     std::vector<std::vector<SegDetection>> sort_by_color(const cv::Mat& image, const std::vector<SegDetection>& detections, double eps, int minPts) const;
 
+<<<<<<< HEAD
     void sort_by_individual_color_uniformity(const cv::Mat& labImage, const SegDetection& detection) const;
+=======
+    void sort_by_individual_color_uniformity(const cv::Mat& image, const SegDetection& detection) const;
+>>>>>>> 37d935d16541a5f511d10402a8b7830ab0d4312e
 
     Ort::Env            env_;
     Ort::SessionOptions session_opts_;
