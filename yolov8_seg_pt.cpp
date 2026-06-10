@@ -10,7 +10,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
-
+#include <unordered_set>
 
 constexpr float CONF_PREPROCESS = 0.25f;
 
@@ -267,7 +267,7 @@ std::vector<SegDetection> YOLOv8Seg::detect(
         const float* det_data = outputs[0].GetTensorData<float>();
         const float* proto_data = outputs[1].GetTensorData<float>();
 
-        // --- postprocess in tile-local coords ---
+        // Lokale koordinaten
         auto dets = postprocess(det_data, num_anchors, num_classes,
             proto_data, nm, proto_h, proto_w,
             scale, pad_w, pad_h,
@@ -302,7 +302,7 @@ std::vector<SegDetection> YOLOv8Seg::detect(
             std::make_move_iterator(dets.end()));
     }
 
-    // --- second NMS pass to remove cross-tile duplicates ---
+    // 2.NMS
     std::vector<cv::Rect> all_boxes;
     std::vector<float>    all_scores;
     all_boxes.reserve(all_detections.size());
@@ -544,7 +544,7 @@ cv::Mat YOLOv8Seg::draw(const cv::Mat& image,
         const cv::Scalar& colour = colors[j];
         for (size_t i = 0; i < brick_categories[j].size(); ++i) {
             const auto& d = brick_categories[j][i];  
-            sort_by_individual_color_uniformity(d);
+
             /*
             // --- mask overlay ---
             if (!d.mask.empty()) {
@@ -817,6 +817,11 @@ std::vector<std::vector<SegDetection>> YOLOv8Seg::sort_by_color(const cv::Mat& i
     cv::Mat labImage;
     cv::cvtColor(image, labImage, cv::COLOR_BGR2Lab);
 
+    for (size_t i = 0; i < detections.size(); i++) {
+        std::cout << "brick " << i;
+        sort_by_individual_color_uniformity(labImage, detections[i]);
+    }
+
     //cv::Vec3b inputPx = image.at<cv::Vec3b>(image.rows / 2, image.cols / 2);
 
 
@@ -869,9 +874,27 @@ std::vector<std::vector<SegDetection>> YOLOv8Seg::sort_by_color(const cv::Mat& i
     return clusters;
 }
 
-void YOLOv8Seg::sort_by_individual_color_uniformity(const SegDetection& detection) const{
+void YOLOv8Seg::sort_by_individual_color_uniformity(const cv::Mat& labImage, const SegDetection& detection) const{
    
-    LabHistogram histogram("debug_" + std::to_string(det.box.x) + "_" + std::to_string(det.box.y) + ".txt");
+    cv::Rect safeBox = detection.box & cv::Rect(0, 0, labImage.cols, labImage.rows);
+    if (safeBox.empty()) return;
+    cv::Mat roiImage = labImage(safeBox);
+
+    cv::Mat roiMask;
+    cv::Rect maskRect(detection.mask_origin, safeBox.size());
+    cv::Rect safeMaskRect = maskRect & cv::Rect(0, 0, detection.mask.cols, detection.mask.rows);
+    if (!safeMaskRect.empty()) {
+        roiMask = detection.mask(safeMaskRect);
+        if (roiMask.size() != roiImage.size())
+            cv::resize(roiMask, roiMask, roiImage.size(), 0, 0, cv::INTER_NEAREST);
+    }
+    else {
+        roiMask = cv::Mat::ones(roiImage.size(), CV_8UC1) * 255;
+    }
+
+    LabHistogram histogram("debug_" + std::to_string(detection.box.x) + "_" + std::to_string(detection.box.y) + ".txt");
+
+    histogram.accumulate(roiImage, roiMask);
 
     auto colors = histogram.sortedColors();
     
@@ -879,14 +902,43 @@ void YOLOv8Seg::sort_by_individual_color_uniformity(const SegDetection& detectio
 
     std::vector<Point3D> labColors;
     for (auto c : colors) {
-        labColors.push_back({ c[1], c[2], c[3] });
+        labColors.push_back({ c.lab[0], c.lab[1], c.lab[2] });
     }
 
-    DBSCAN dbscan(5, 1);
+    DBSCAN dbscan(20, 1);
 
     std::vector<int> labels = dbscan.fit(labColors);
 
-    std::cout << "brick has " << labels.size() << "dominant colors \n";s
+    // Keep only the first (highest-weight) color per cluster
+    // sortedColors() is already sorted by count descending, so the first
+    // occurrence of each cluster ID is the dominant one
+    std::vector<ColorBin> uniqueColors;
+    std::unordered_set<int> seenClusters;
+
+    for (int i = 0; i < static_cast<int>(colors.size()); i++) {
+        int label = labels[i];
+        if (label == DBSCAN::NOISE) {
+            // Optionally include noise points as their own unique colors
+            uniqueColors.push_back(colors[i]);
+            continue;
+        }
+        if (seenClusters.find(label) == seenClusters.end()) {
+            seenClusters.insert(label);
+            uniqueColors.push_back(colors[i]);
+        }
+        // else: skip — same cluster already represented
+    }
+
+    std::cout << " has " << uniqueColors.size() << " dominant colors:\n";
+    for (int i = 0; i < static_cast<int>(uniqueColors.size()); i++) {
+        const auto& c = uniqueColors[i];
+        std::cout << "  [" << i << "] "
+            << "count=" << c.count
+            << "  L=" << c.lab[0]
+            << "  a=" << c.lab[1]
+            << "  b=" << c.lab[2]
+            << "\n";
+    }
 
 }
 
@@ -932,6 +984,7 @@ std::vector<double> convertToPolyMask(const cv::Mat& image, SegDetection d) {
     return poly;
 }
 
+/*
 // ============================================================
 //  GetPolygons transforms detections into polygon representations, either as bounding boxes or mask contours.
 // ============================================================
@@ -1026,3 +1079,4 @@ std::vector<unsigned long> MLSeg::GetColorsOfClusters()
     }
     return colors;
 }
+*/

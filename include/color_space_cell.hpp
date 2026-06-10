@@ -303,7 +303,7 @@ public:
 
             if (static_cast<int>(neighbours.size()) <= minPts_) {
                 labels[i] = NOISE;
-                std::cout << "label" << i << " ist NOISE zugewiesen";
+                //std::cout << "label" << i << " ist NOISE zugewiesen";
                 continue;
             }
 
